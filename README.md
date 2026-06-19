@@ -1,79 +1,63 @@
-## Welcome to Apache Tomcat!
+# Hindustan Aeronautics Limited (HAL)
+## Overhaul Division, Bangalore - HR Seniority Management System
 
-### What Is It?
+An enterprise portal developed for the Human Resources department of the HAL Overhaul Division. This system automates the complex computation of employee seniority rankings using official legacy rules, featuring a premium custom HAL-branded dashboard.
 
-The Apache Tomcat® software is an open source implementation of the Java
-Servlet, JavaServer Pages, Java Expression Language and Java WebSocket
-technologies. The Java Servlet, JavaServer Pages, Java Expression Language and
-Java WebSocket specifications are developed under the
-[Java Community Process](https://jcp.org/en/introduction/overview).
+---
 
-The Apache Tomcat software is developed in an open and participatory
-environment and released under the
-[Apache License version 2](https://www.apache.org/licenses/). The Apache Tomcat
-project is intended to be a collaboration of the best-of-breed developers from
-around the world. We invite you to participate in this open development
-project. To learn more about getting involved,
-[click here](https://tomcat.apache.org/getinvolved.html) or keep reading.
+## 🚀 One-Click Execution
 
-Apache Tomcat software powers numerous large-scale, mission-critical web
-applications across a diverse range of industries and organizations. Some of
-these users and their stories are listed on the
-[PoweredBy wiki page](https://cwiki.apache.org/confluence/display/TOMCAT/PoweredBy).
+To start the portal on any Windows machine:
+1. Open the project directory.
+2. Double-click the **`start_hal_system.bat`** script.
+3. Once the server starts, open your browser and navigate to:
+   👉 **[http://localhost:8080/HAL/](http://localhost:8080/HAL/)**
 
-Apache Tomcat, Tomcat, Apache, the Apache feather, and the Apache Tomcat
-project logo are trademarks of the Apache Software Foundation.
+### 🔑 Credentials
+* **Administrator Role (Full Read/Write/Delete Access):**
+  * **Username:** `admin`
+  * **Password:** `admin123`
+* **HR Operator Role (Read & Registry Addition Access):**
+  * **Username:** `operator`
+  * **Password:** `hal123`
 
-### Get It
+---
 
-For every major Tomcat version there is one download page containing
-links to the latest binary and source code downloads, but also
-links for browsing the download directories and archives:
-- [Tomcat 11](https://tomcat.apache.org/download-11.cgi)
-- [Tomcat 10](https://tomcat.apache.org/download-10.cgi)
-- [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
+## ⚡ Key Features
 
-To facilitate choosing the right major Tomcat version one, we have provided a
-[version overview page](https://tomcat.apache.org/whichversion.html).
+1. **Dynamic Seniority Engine:** Automatically computes seniority rankings in real-time based on the multi-tiered fallback rules.
+2. **Interactive Career Timeline Modals:** Clicking any employee's name displays a chronological vertical timeline of their entire career at HAL, detailing designations, department shifts, promotion order numbers, and position codes.
+3. **Dynamic Column Hiding:** The table headers dynamically hide columns for grades that have no promotion data in the currently filtered list, keeping the screen compact and uncluttered.
+4. **Offline Demo Fallback Mode:** If the connection to the secure Oracle database server is not available, the system automatically runs in **Demo Mode**, seeding an in-memory database with over 100 mockup profiles.
+5. **HAL Custom Branded Interface:** Designed around the official HAL palette, featuring the Indian flag tricolor bar, custom SVG globe logos with jet trajectories, and subtle LCA Tejas fighter jet watermark backgrounds.
+6. **One-Click CSV Export & PDF Printing:** Generate official reports instantly for board meetings or audits.
 
-### Documentation
+---
 
-The documentation available as of the date of this release is
-included in the docs webapp which ships with tomcat. You can access that webapp
-by starting tomcat and visiting <http://localhost:8080/docs/> in your browser.
-The most up-to-date documentation for each version can be found at:
-- [Tomcat 11](https://tomcat.apache.org/tomcat-11.0-doc/)
-- [Tomcat 10](https://tomcat.apache.org/tomcat-10.1-doc/)
-- [Tomcat 9](https://tomcat.apache.org/tomcat-9.0-doc/)
+## 📐 Seniority Rule Hierarchy
 
-### Installation
+The system calculates rankings dynamically using the following hierarchical criteria:
+1. **Grade Weight:** Employees in higher grades are senior (Grade 10 is highest, Grade 1 is lowest).
+2. **Current Grade Promotion Date:** The employee with the earlier promotion date to their current grade is senior.
+3. **Historical Promotion Dates (Backwards):** If current promotion dates are identical, the system compares previous promotion dates grade-by-grade backwards (Grade 9, Grade 8, down to Grade 1).
+4. **Date of Joining (DOJ):** If all promotion dates are identical, the employee with the earlier Date of Joining is senior.
+5. **Date of Birth (DOB):** If DOJ is also identical, the older employee is senior (older by age).
+6. **Employee ID:** Tie-breaker (lexicographical order).
 
-Please see [RUNNING.txt](RUNNING.txt) for more info.
+---
 
-### Licensing
+## 📱 Offline Sharing & Presentations (HAL Campus)
 
-Please see [LICENSE](LICENSE) for more info.
+Since secure campus zones often restrict internet, Wi-Fi, and USB storage, you can present this system to evaluators and mentors using these portable methods:
 
-### Support and Mailing List Information
+### Method A: Standalone Mock App (Offline Phone/Tablet)
+1. In the project root, locate the standalone file **`index.html`**.
+2. Email or message this file to your phone/tablet *before* entering secure zones.
+3. Save the file to your device's files/downloads and open it.
+4. **It works 100% offline.** All CSS, Javascript logic (including the 7-tier seniority calculator), and mockup data are embedded inside this single file. No server or network required!
 
-* Free community support is available through the
-[tomcat-users](https://tomcat.apache.org/lists.html#tomcat-users) email list and
-a dedicated [IRC channel](https://tomcat.apache.org/irc.html) (#tomcat on
-Freenode).
+### Method B: Print-out Dossier
+* Use the **"Print Report"** button on the live portal to print high-resolution reports of the **Seniority Rankings**, **Employee Directory**, and **Career Timelines** to keep a clean physical binder.
 
-* If you want freely available support for running Apache Tomcat, please see the
-resources page [here](https://tomcat.apache.org/findhelp.html).
-
-* If you want to be informed about new code releases, bug fixes,
-security fixes, general news and information about Apache Tomcat, please
-subscribe to the
-[tomcat-announce](https://tomcat.apache.org/lists.html#tomcat-announce) email
-list.
-
-* If you have a concrete bug report for Apache Tomcat, please see the
-instructions for reporting a bug
-[here](https://tomcat.apache.org/bugreport.html).
-
-### Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for more info.
+### Method C: Optical Media (CD-R/DVD-R)
+* Burn the `index.html` or the entire project folder to a CD-R. Optical drives are frequently whitelisted on secure HAL terminals where USB ports are disabled.
