@@ -447,7 +447,7 @@
                                     <th rowspan="2" style="vertical-align: middle;">Div/Office</th>
                                     <th rowspan="2" style="vertical-align: middle;">Complex</th>
                                     <th rowspan="2" style="vertical-align: middle;">PB No</th>
-                                    <th rowspan="2" style="vertical-align: middle;">Name (S/Shri)</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Name</th>
                                     <th rowspan="2" style="vertical-align: middle;">Discipline</th>
                                     <th rowspan="2" style="vertical-align: middle;">Present Designation</th>
                                     <th rowspan="2" style="vertical-align: middle;">Present Grade</th>
@@ -461,21 +461,21 @@
                                     <th rowspan="2" style="vertical-align: middle;">Date of Joining</th>
                                     <th rowspan="2" style="vertical-align: middle;">Date of Absorption</th>
                                     <th rowspan="2" style="vertical-align: middle;">Date of seniority in present grade</th>
-                                    <th colspan="10" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Seniority in Grades</th>
+                                    <th id="seniorityInGradesHeader" colspan="10" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Seniority in Grades</th>
                                     <th rowspan="2" style="vertical-align: middle;">Educational Qualification</th>
                                     <th rowspan="2" style="vertical-align: middle;">Remarks</th>
                                 </tr>
                                 <tr>
-                                    <th style="text-align: center; min-width: 85px;">I</th>
-                                    <th style="text-align: center; min-width: 85px;">II</th>
-                                    <th style="text-align: center; min-width: 85px;">III</th>
-                                    <th style="text-align: center; min-width: 85px;">IV</th>
-                                    <th style="text-align: center; min-width: 85px;">V</th>
-                                    <th style="text-align: center; min-width: 85px;">VI</th>
-                                    <th style="text-align: center; min-width: 85px;">VII</th>
-                                    <th style="text-align: center; min-width: 85px;">VIII</th>
-                                    <th style="text-align: center; min-width: 85px;">IX</th>
-                                    <th style="text-align: center; min-width: 85px;">X</th>
+                                    <th id="th-grade-1" style="text-align: center; min-width: 85px;">I</th>
+                                    <th id="th-grade-2" style="text-align: center; min-width: 85px;">II</th>
+                                    <th id="th-grade-3" style="text-align: center; min-width: 85px;">III</th>
+                                    <th id="th-grade-4" style="text-align: center; min-width: 85px;">IV</th>
+                                    <th id="th-grade-5" style="text-align: center; min-width: 85px;">V</th>
+                                    <th id="th-grade-6" style="text-align: center; min-width: 85px;">VI</th>
+                                    <th id="th-grade-7" style="text-align: center; min-width: 85px;">VII</th>
+                                    <th id="th-grade-8" style="text-align: center; min-width: 85px;">VIII</th>
+                                    <th id="th-grade-9" style="text-align: center; min-width: 85px;">IX</th>
+                                    <th id="th-grade-10" style="text-align: center; min-width: 85px;">X</th>
                                 </tr>
                                 <!-- Clean filter dropdowns row -->
                                 <tr class="filter-row no-print">
@@ -497,7 +497,16 @@
                                     <th><input type="text" id="filter-doj" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
                                     <th><input type="text" id="filter-doa" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
                                     <th><input type="text" id="filter-promoDate" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
-                                    <th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th>
+                                    <th id="th-filter-grade-1"></th>
+                                    <th id="th-filter-grade-2"></th>
+                                    <th id="th-filter-grade-3"></th>
+                                    <th id="th-filter-grade-4"></th>
+                                    <th id="th-filter-grade-5"></th>
+                                    <th id="th-filter-grade-6"></th>
+                                    <th id="th-filter-grade-7"></th>
+                                    <th id="th-filter-grade-8"></th>
+                                    <th id="th-filter-grade-9"></th>
+                                    <th id="th-filter-grade-10"></th>
                                     <th><select id="filter-qualification" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
                                     <th><input type="text" id="filter-remarks" class="header-filter-input" placeholder="Search..." onkeyup="applyFilters()"></th>
                                 </tr>
@@ -727,6 +736,32 @@
                     : gradeVal + " Seniority Rankings";
             }
 
+            // Dynamic display of Seniority in Grades columns
+            var maxGradeVisible = 10;
+            if (gradeVal && gradeVal.indexOf("Grade ") === 0) {
+                var num = parseInt(gradeVal.substring(6));
+                if (!isNaN(num) && num >= 1 && num <= 10) {
+                    maxGradeVisible = num;
+                }
+            }
+
+            var headerEl = document.getElementById('seniorityInGradesHeader');
+            if (headerEl) {
+                headerEl.colSpan = maxGradeVisible;
+                headerEl.style.display = maxGradeVisible > 0 ? '' : 'none';
+            }
+
+            for (var g = 1; g <= 10; g++) {
+                var thEl = document.getElementById('th-grade-' + g);
+                if (thEl) {
+                    thEl.style.display = (g <= maxGradeVisible) ? '' : 'none';
+                }
+                var filterThEl = document.getElementById('th-filter-grade-' + g);
+                if (filterThEl) {
+                    filterThEl.style.display = (g <= maxGradeVisible) ? '' : 'none';
+                }
+            }
+
             currentPage = 1;
             renderTable();
         }
@@ -745,8 +780,18 @@
             
             document.getElementById('displayCountLabel').innerText = 'Showing ' + (totalRecords > 0 ? (startIdx + 1) : 0) + ' to ' + endIdx + ' of ' + totalRecords + ' records';
             
+            // Dynamic display of Seniority in Grades columns count
+            var maxGradeVisible = 10;
+            var gradeVal = document.getElementById('filter-grade').value; // e.g. "Grade 5"
+            if (gradeVal && gradeVal.indexOf("Grade ") === 0) {
+                var num = parseInt(gradeVal.substring(6));
+                if (!isNaN(num) && num >= 1 && num <= 10) {
+                    maxGradeVisible = num;
+                }
+            }
+            
             if (totalRecords === 0) {
-                tbody.innerHTML = '<tr><td colspan="30" style="text-align: center; color: var(--text-light); padding: 2rem;">No employee records match the filters.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="' + (20 + maxGradeVisible) + '" style="text-align: center; color: var(--text-light); padding: 2rem;">No employee records match the filters.</td></tr>';
                 updatePaginationControls(0);
                 return;
             }
@@ -756,11 +801,22 @@
             pageList.forEach(function(emp, index) {
                 var tr = document.createElement('tr');
                 
-                // Build the promotion history columns (I to X)
+                // Build the promotion history columns (I to maxGradeVisible)
                 var gradeCols = '';
-                for (var g = 1; g <= 10; g++) {
+                for (var g = 1; g <= maxGradeVisible; g++) {
                     var pd = emp.history['Grade ' + g];
                     gradeCols += '<td style="text-align: center; font-size: 0.85rem;">' + (pd ? formatDate(pd) : '-') + '</td>';
+                }
+                
+                // Determine salutation based on gender
+                var salutation = "S/Shri";
+                if (emp.gender) {
+                    var gLower = emp.gender.trim().toLowerCase();
+                    if (gLower === 'male' || gLower === 'm') {
+                        salutation = "Shri";
+                    } else if (gLower === 'female' || gLower === 'f') {
+                        salutation = "Smt.";
+                    }
                 }
                 
                 tr.innerHTML = 
@@ -768,7 +824,7 @@
                     '<td>' + emp.division + '</td>' +
                     '<td>' + emp.complex + '</td>' +
                     '<td><strong>' + emp.employeeId + '</strong></td>' +
-                    '<td>S/Shri ' + emp.employeeName + '</td>' +
+                    '<td>' + salutation + ' ' + emp.employeeName + '</td>' +
                     '<td>' + emp.discipline + '</td>' +
                     '<td>' + emp.designation + '</td>' +
                     '<td>' + emp.grade + '</td>' +

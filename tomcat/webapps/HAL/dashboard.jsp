@@ -209,7 +209,6 @@
             animation: jetGlide 3.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
             animation-delay: 0.5s;
         }
-
         .stat-value {
             font-size: 2rem;
             font-weight: bold;

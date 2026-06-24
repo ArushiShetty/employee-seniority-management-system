@@ -672,7 +672,7 @@
                     <div class="card no-print">
                         <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                             <label class="form-label" style="margin-bottom: 0;">Filter Seniority List by Grade:</label>
-                             <select id="seniorityGradeFilter" class="form-control" style="max-width: 320px;" onchange="renderSeniorityTable()">
+                             <select id="seniorityGradeFilter" class="form-control" style="max-width: 320px;" onchange="syncTopGradeFilter()">
                                 <option value="ALL" selected>All Grades (Global Ranks)</option>
                                 <option value="Grade 1">Grade 1 (Trainee / Assistant Engineer)</option>
                                 <option value="Grade 2">Grade 2 (Engineer / Officer)</option>
@@ -696,34 +696,93 @@
                              <table class="data-table" id="seniorityTable">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2" style="width: 80px; text-align: center; vertical-align: middle;">Rank</th>
-                                        <th rowspan="2" style="vertical-align: middle;">Employee ID</th>
-                                        <th rowspan="2" style="vertical-align: middle;">Employee Name</th>
-                                        <th rowspan="2" style="vertical-align: middle;">Grade</th>
-                                        <th colspan="10" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Promotion Dates per Grade (Position)</th>
+                                        <th rowspan="2" style="width: 60px; text-align: center; vertical-align: middle;">Sl No.</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Div/Office</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Complex</th>
+                                        <th rowspan="2" style="vertical-align: middle;">PB No</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Name</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Discipline</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Present Designation</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Present Grade</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Gender</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Ex DT/MT</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Ex Servicemen</th>
+                                        <th rowspan="2" style="vertical-align: middle;">PHP</th>
+                                        <th rowspan="2" style="vertical-align: middle;">SC/ST/OBC/Gen</th>
+                                        <th rowspan="2" style="vertical-align: middle;">DOB</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Super Annuation</th>
                                         <th rowspan="2" style="vertical-align: middle;">Date of Joining</th>
-                                        <th rowspan="2" style="vertical-align: middle;">Date of Birth</th>
-                                        <th rowspan="2" style="vertical-align: middle;">Retirement Date</th>
-                                        <th rowspan="2" style="vertical-align: middle;">Department</th>
-                                        <th rowspan="2" style="vertical-align: middle;">Designation</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Date of Absorption</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Date of seniority in present grade</th>
+                                        <th id="seniorityInGradesHeader" colspan="10" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Seniority in Grades</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Educational Qualification</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Remarks</th>
                                     </tr>
                                     <tr>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 10</th>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 9</th>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 8</th>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 7</th>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 6</th>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 5</th>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 4</th>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 3</th>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 2</th>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 1</th>
+                                        <th id="th-grade-1" style="text-align: center; min-width: 85px;">I</th>
+                                        <th id="th-grade-2" style="text-align: center; min-width: 85px;">II</th>
+                                        <th id="th-grade-3" style="text-align: center; min-width: 85px;">III</th>
+                                        <th id="th-grade-4" style="text-align: center; min-width: 85px;">IV</th>
+                                        <th id="th-grade-5" style="text-align: center; min-width: 85px;">V</th>
+                                        <th id="th-grade-6" style="text-align: center; min-width: 85px;">VI</th>
+                                        <th id="th-grade-7" style="text-align: center; min-width: 85px;">VII</th>
+                                        <th id="th-grade-8" style="text-align: center; min-width: 85px;">VIII</th>
+                                        <th id="th-grade-9" style="text-align: center; min-width: 85px;">IX</th>
+                                        <th id="th-grade-10" style="text-align: center; min-width: 85px;">X</th>
+                                    </tr>
+                                    <tr class="filter-row no-print">
+                                        <th></th>
+                                        <th><select id="filter-division" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><select id="filter-complex" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><input type="text" id="filter-employeeId" class="header-filter-input" placeholder="Search ID..." onkeyup="applyFilters()"></th>
+                                        <th><input type="text" id="filter-employeeName" class="header-filter-input" placeholder="Search name..." onkeyup="applyFilters()"></th>
+                                        <th><select id="filter-discipline" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><select id="filter-designation" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><select id="filter-grade" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><select id="filter-gender" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><select id="filter-exDtMt" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><select id="filter-exServicemen" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><select id="filter-php" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><select id="filter-category" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><input type="text" id="filter-dob" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                        <th><input type="text" id="filter-retDate" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                        <th><input type="text" id="filter-doj" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                        <th><input type="text" id="filter-doa" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                        <th><input type="text" id="filter-promoDate" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                        <th id="th-filter-grade-1"></th>
+                                        <th id="th-filter-grade-2"></th>
+                                        <th id="th-filter-grade-3"></th>
+                                        <th id="th-filter-grade-4"></th>
+                                        <th id="th-filter-grade-5"></th>
+                                        <th id="th-filter-grade-6"></th>
+                                        <th id="th-filter-grade-7"></th>
+                                        <th id="th-filter-grade-8"></th>
+                                        <th id="th-filter-grade-9"></th>
+                                        <th id="th-filter-grade-10"></th>
+                                        <th><select id="filter-qualification" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                        <th><input type="text" id="filter-remarks" class="header-filter-input" placeholder="Search..." onkeyup="applyFilters()"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="seniorityTableBody">
                                     <!-- Populated dynamically via JS sorting engine -->
                                 </tbody>
                             </table>
+                        </div>
+                        
+                        <!-- Pagination controls -->
+                        <div class="pagination-container no-print" style="display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; flex-wrap: wrap; gap: 1rem; font-size: 0.9rem; color: var(--text-light);">
+                            <div id="displayCountLabel">Showing 0 to 0 of 0 records</div>
+                            <div class="pagination-controls" style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label for="pageSizeSelect" style="margin-right: 0.5rem;">Page Size:</label>
+                                <select id="pageSizeSelect" onchange="changePageSize()" style="padding: 0.3rem; border-radius: 4px; border: 1px solid var(--border-color); margin-right: 1rem;">
+                                    <option value="50" selected>50</option>
+                                    <option value="100">100</option>
+                                    <option value="ALL">All</option>
+                                </select>
+                                <button id="prevPageBtn" class="page-btn" onclick="prevPage()" style="padding: 0.4rem 0.8rem; background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; font-weight: bold; color: var(--text-dark);">&larr; Prev</button>
+                                <span id="currentPageLabel">Page 1 of 1</span>
+                                <button id="nextPageBtn" class="page-btn" onclick="nextPage()" style="padding: 0.4rem 0.8rem; background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; font-weight: bold; color: var(--text-dark);">Next &rarr;</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -745,8 +804,19 @@
                 promotionDate: "2025-07-01",
                 dateOfJoining: "1995-07-01",
                 dateOfBirth: "1970-04-12",
-                department: "LCA Division",
-                designation: "Additional General Manager",
+                dateOfAbsorption: "1995-07-01",
+                department: "LCA Division Dept",
+                designation: "Additional General Manager (Technical)",
+                division: "LCA",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "NA",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Mech)",
+                remarks: "Verified",
                 history: [
                     { grade: "Grade 8", promoDate: "2015-07-01" },
                     { grade: "Grade 9", promoDate: "2025-07-01" }
@@ -760,8 +830,19 @@
                 promotionDate: "2025-07-01",
                 dateOfJoining: "1992-06-01",
                 dateOfBirth: "1967-11-20",
-                department: "Overhaul Division",
-                designation: "General Manager",
+                dateOfAbsorption: "1992-06-01",
+                department: "Technical Dept",
+                designation: "General Manager (Technical)",
+                division: "OVERHAUL",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "DT",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Civil)",
+                remarks: "Historical Figure",
                 history: [
                     { grade: "Grade 9", promoDate: "2020-07-01" },
                     { grade: "Grade 10", promoDate: "2025-07-01" }
@@ -775,8 +856,19 @@
                 promotionDate: "2024-07-01",
                 dateOfJoining: "2005-01-01",
                 dateOfBirth: "1980-08-15",
+                dateOfAbsorption: "2006-01-01",
                 department: "Services Dept",
-                designation: "Chief Manager",
+                designation: "Chief Manager (Services)",
+                division: "OVERHAUL",
+                complex: "",
+                discipline: "HR",
+                gender: "Male",
+                exDtMt: "MT",
+                exServicemen: "N",
+                php: "N",
+                category: "OBC",
+                qualification: "MBA (HR)",
+                remarks: "",
                 history: [
                     { grade: "Grade 5", promoDate: "2013-07-01" },
                     { grade: "Grade 6", promoDate: "2019-07-01" },
@@ -791,8 +883,19 @@
                 promotionDate: "2023-01-01",
                 dateOfJoining: "2012-12-14",
                 dateOfBirth: "1992-05-05",
-                department: "Jet Engine Overhaul",
-                designation: "Highly Skilled Technician",
+                dateOfAbsorption: "2013-12-14",
+                department: "Technical Dept",
+                designation: "Highly Skilled Technician (Technical)",
+                division: "ENGINE",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "DT",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Mech)",
+                remarks: "",
                 history: [
                     { grade: "Grade 1", promoDate: "2012-12-14" },
                     { grade: "Grade 2", promoDate: "2012-12-14" },
@@ -808,8 +911,19 @@
                 promotionDate: "2023-01-01",
                 dateOfJoining: "2012-12-17",
                 dateOfBirth: "1991-03-14",
-                department: "Jet Engine Overhaul",
-                designation: "Highly Skilled Technician",
+                dateOfAbsorption: "2013-12-17",
+                department: "Technical Dept",
+                designation: "Highly Skilled Technician (Technical)",
+                division: "ENGINE",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "DT",
+                exServicemen: "N",
+                php: "N",
+                category: "OBC",
+                qualification: "B.Tech (ECE)",
+                remarks: "",
                 history: [
                     { grade: "Grade 1", promoDate: "2012-12-17" },
                     { grade: "Grade 2", promoDate: "2012-12-17" },
@@ -825,8 +939,19 @@
                 promotionDate: "2023-01-01",
                 dateOfJoining: "2012-12-26",
                 dateOfBirth: "1990-10-10",
-                department: "Jet Engine Overhaul",
-                designation: "Highly Skilled Technician",
+                dateOfAbsorption: "2013-12-26",
+                department: "Technical Dept",
+                designation: "Highly Skilled Technician (Technical)",
+                division: "ENGINE",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "DT",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Mech)",
+                remarks: "",
                 history: [
                     { grade: "Grade 1", promoDate: "2012-12-26" },
                     { grade: "Grade 2", promoDate: "2012-12-26" },
@@ -836,110 +961,79 @@
             }
         ];
 
-        // Programmatically generate 10 employees for every grade (Grade 1 to 10) to match Java backend exactly
+        // Programmatically generate 5 employees for every grade (Grade 1 to 10) to match dynamic app
         (function() {
             var firstNames = ["Amit", "Rohan", "Sanjay", "Karan", "Vijay", "Anand", "Deepak", "Vikram", "Sunil", "Rajesh", "Manoj", "Pradeep", "Ashok", "Suresh", "Ramesh", "Ajay", "Dinesh", "Harish", "Arvind", "Sandeep"];
-            var lastNames = ["Patil", "Nair", "Joshi", "Iyer", "Rao", "Reddy", "Mehta", "Gowda", "Mishra", "Gupta", "Sen", "Bose", "Das", "Roy", "Nair", "Kumar", "Sharma", "Singh", "Prasad", "Verma"];
-            var depts = ["LCA Assembly", "Overhaul Engine", "Jet Avionics", "Services Maintenance", "Purchase Logistics", "Information Systems", "Finance Accounting", "Human Resources"];
-            
-            var olderNames = [
-                "",
-                "Aarav Patil",
-                "Rohan Nair",
-                "Sanjay Joshi",
-                "Karan Iyer",
-                "Vijay Rao",
-                "Anand Reddy",
-                "Deepak Mehta",
-                "Vikram Gowda",
-                "Sunil Mishra",
-                "Rajesh Gupta"
-            ];
-            var youngerNames = [
-                "",
-                "Alok Deshmukh",
-                "Rahul Pillai",
-                "Sandeep Kulkarni",
-                "Kunal Menon",
-                "Varun Hegde",
-                "Arjun Naidu",
-                "Dinesh Shah",
-                "Vinay Shettigar",
-                "Suresh Pandey",
-                "Ramesh Bansal"
-            ];
+            var lastNames = ["Patil", "Nair", "Joshi", "Iyer", "Rao", "Reddy", "Mehta", "Gowda", "Mishra", "Gupta", "Sen", "Bose", "Das", "Roy", "Sharma", "Singh", "Prasad", "Verma"];
+            var divisions = ["OVERHAUL", "AIRCRAFT", "ENGINE", "HELICOPTER", "AVIONICS", "ACCESSORIES", "TRANSPORT", "MCMRDC", "AERDC"];
+            var disciplines = ["Technical", "HR", "Finance", "IT", "Materials Management", "Legal", "Security", "PR"];
+            var qualifications = ["BE (Aero)", "B.Tech (Mech)", "BE (ECE)", "B.Tech (CS)", "MBA (HR)", "CA", "ICWA", "LLB", "M.Tech", "PhD"];
             
             for (var g = 1; g <= 10; g++) {
-                for (var k = 0; k < 12; k++) {
+                for (var k = 0; k < 5; k++) {
                     var empIdInt = 120000 + (g * 100) + k;
                     var empIdStr = String(empIdInt);
                     
-                    var firstName, lastName, fullName, dept, careerDurationYears, currentPromoYear, joinYear, doj, dob;
-                    careerDurationYears = (g - 1) * 3;
+                    var firstName = firstNames[(g * k + k) % firstNames.length];
+                    var lastName = lastNames[(g * k + g) % lastNames.length];
+                    var fullName = firstName + " " + lastName;
                     
-                    if (k >= 10) {
-                        dept = "Overhaul Engine";
-                        currentPromoYear = 2022;
-                        joinYear = currentPromoYear - careerDurationYears;
-                        doj = joinYear + "-05-15";
-                        
-                        if (k === 10) {
-                            fullName = olderNames[g];
-                            dob = (joinYear - 28) + "-04-12";
-                        } else {
-                            fullName = youngerNames[g];
-                            dob = (joinYear - 24) + "-08-25";
-                        }
+                    var division = divisions[(g + k) % divisions.length];
+                    var discipline = ((g + k) % 10 < 7) ? "Technical" : disciplines[(g * k) % (disciplines.length - 1) + 1];
+                    
+                    var designation = getDesignationForGradeJS("Grade " + g);
+                    if (discipline !== "Technical") {
+                        if (g === 1) designation = "Assistant Officer (" + discipline + ")";
+                        else if (g === 2) designation = "Officer (" + discipline + ")";
+                        else designation = designation + " (" + discipline + ")";
                     } else {
-                        firstName = firstNames[(g * k + k) % firstNames.length];
-                        lastName = lastNames[(g * k + g) % lastNames.length];
-                        fullName = firstName + " " + lastName;
-                        dept = depts[(g + k) % depts.length];
-                        
-                        currentPromoYear = 2020 + (k % 6);
-                        joinYear = currentPromoYear - careerDurationYears;
-                        
-                        var joinMonth = 1 + (k % 12);
-                        var joinDay = 1 + (k * 7) % 28;
-                        var joinMonthStr = joinMonth < 10 ? "0" + joinMonth : "" + joinMonth;
-                        var joinDayStr = joinDay < 10 ? "0" + joinDay : "" + joinDay;
-                        doj = joinYear + "-" + joinMonthStr + "-" + joinDayStr;
-                        
-                        var birthYear = joinYear - 22 - (k % 5);
-                        var birthMonth = 1 + ((k + 3) % 12);
-                        var birthDay = 1 + ((k * 3) % 28);
-                        var birthMonthStr = birthMonth < 10 ? "0" + birthMonth : "" + birthMonth;
-                        var birthDayStr = birthDay < 10 ? "0" + birthDay : "" + birthDay;
-                        dob = birthYear + "-" + birthMonthStr + "-" + birthDayStr;
+                        designation = designation + " (Technical)";
                     }
                     
-                    var history = [];
-                    var lastDesig = "";
-                    var lastPromoDate = "";
+                    var careerDurationYears = (g - 1) * 3;
+                    var currentPromoYear = 2024 - (k % 3);
+                    var joinYear = currentPromoYear - careerDurationYears;
                     
+                    var joinMonth = 1 + (k % 12);
+                    var joinDay = 1 + (k * 7) % 28;
+                    var joinMonthStr = joinMonth < 10 ? "0" + joinMonth : "" + joinMonth;
+                    var joinDayStr = joinDay < 10 ? "0" + joinDay : "" + joinDay;
+                    var doj = joinYear + "-" + joinMonthStr + "-" + joinDayStr;
+                    
+                    var birthYear = joinYear - 22 - (k % 5);
+                    var birthMonth = 1 + ((k + 3) % 12);
+                    var birthDay = 1 + ((k * 3) % 28);
+                    if (k === 0) birthDay = 1; // test case for first of month
+                    var birthMonthStr = birthMonth < 10 ? "0" + birthMonth : "" + birthMonth;
+                    var birthDayStr = birthDay < 10 ? "0" + birthDay : "" + birthDay;
+                    var dob = birthYear + "-" + birthMonthStr + "-" + birthDayStr;
+                    
+                    var exDtMt = "NA";
+                    if (k % 2 === 0) {
+                        exDtMt = (discipline === "Technical") ? "DT" : "MT";
+                    }
+                    
+                    var absDate = doj;
+                    if (exDtMt === "DT" || exDtMt === "MT") {
+                        absDate = (joinYear + 1) + "-" + joinMonthStr + "-" + joinDayStr;
+                    }
+                    
+                    var exServicemen = (k === 0) ? "Y" : "N";
+                    var php = (k === 1) ? "Y" : "N";
+                    var category = ["Gen", "OBC", "SC", "ST"][(g * k) % 4];
+                    var gender = (k % 3 === 0) ? "Female" : "Male";
+                    var qual = qualifications[(g + k) % qualifications.length];
+                    
+                    var history = [];
+                    var lastPromoDate = doj;
                     for (var pg = 1; pg <= g; pg++) {
                         var promoYear = joinYear + (pg - 1) * 3;
                         var pDate = promoYear + "-07-01";
-                        
-                        var des = "Associate Grade " + pg;
-                        if (pg === 1) des = "Trainee (" + dept + ")";
-                        else if (pg === 2) des = "Technician (" + dept + ")";
-                        else if (pg === 3) des = "Senior Technician";
-                        else if (pg === 4) des = "Highly Skilled Technician";
-                        else if (pg === 5) des = "Deputy Manager";
-                        else if (pg === 6) des = "Manager";
-                        else if (pg === 7) des = "Senior Manager";
-                        else if (pg === 8) des = "Chief Manager";
-                        else if (pg === 9) des = "Deputy General Manager";
-                        else if (pg === 10) des = "General Manager";
-                        
                         history.push({
                             grade: "Grade " + pg,
                             promoDate: pDate
                         });
-                        
                         if (pg === g) {
-                            lastDesig = des;
                             lastPromoDate = pDate;
                         }
                     }
@@ -952,8 +1046,19 @@
                         promotionDate: lastPromoDate,
                         dateOfJoining: doj,
                         dateOfBirth: dob,
-                        department: dept,
-                        designation: lastDesig,
+                        dateOfAbsorption: absDate,
+                        department: discipline + " Dept",
+                        designation: designation,
+                        division: division,
+                        complex: "",
+                        discipline: discipline,
+                        gender: gender,
+                        exDtMt: exDtMt,
+                        exServicemen: exServicemen,
+                        php: php,
+                        category: category,
+                        qualification: qual,
+                        remarks: k === 0 ? "Offline Demo Verified" : "",
                         history: history
                     });
                 }
@@ -963,6 +1068,11 @@
         // Load employees from browser localStorage, or use default seed data if empty
         var employees = null;
         try {
+            var rawEmps = localStorage.getItem("hal_employees");
+            // Clear old cache if it does not contain division schema property
+            if (rawEmps && rawEmps.indexOf("division") === -1) {
+                localStorage.removeItem("hal_employees");
+            }
             employees = JSON.parse(localStorage.getItem("hal_employees"));
         } catch (e) {
             console.warn("localStorage access is restricted on local file protocol. Using temporary in-memory storage.");
@@ -974,7 +1084,7 @@
                 localStorage.setItem("hal_employees", JSON.stringify(employees));
             } catch (e) {}
         } else {
-            // Merge/Sync default employees (like M. Visvesvaraya) to ensure cached profiles are fully updated with history
+            // Merge/Sync default employees (like M. Visvesvaraya) to ensure cached profiles are fully updated
             var modified = false;
             defaultEmployees.forEach(function(de) {
                 var existingEmp = employees.find(function(emp) {
@@ -1338,107 +1448,296 @@
         }
 
         // 6. Renders Seniority Engine lists
-        function renderSeniorityTable() {
-            var selectedGrade = document.getElementById("seniorityGradeFilter").value;
-            var title = document.getElementById("seniorityTableTitle");
+        var currentPage = 1;
+        var pageSize = 50;
+        var filteredEmployees = [];
+
+        function populateFilterOptions() {
+            var categoricalCols = {
+                'division': 'filter-division',
+                'complex': 'filter-complex',
+                'discipline': 'filter-discipline',
+                'grade': 'filter-grade',
+                'gender': 'filter-gender',
+                'exDtMt': 'filter-exDtMt',
+                'exServicemen': 'filter-exServicemen',
+                'php': 'filter-php',
+                'category': 'filter-category',
+                'qualification': 'filter-qualification',
+                'designation': 'filter-designation'
+            };
             
-            title.innerText = selectedGrade === "ALL" 
-                ? "Organization-Wide Seniority Listings" 
-                : selectedGrade + " Seniority Rankings";
+            for (var key in categoricalCols) {
+                var selectId = categoricalCols[key];
+                var selectEl = document.getElementById(selectId);
+                if (!selectEl) continue;
+                
+                var uniqueVals = {};
+                employees.forEach(function(emp) {
+                    var val = emp[key];
+                    if (val && val.trim() !== '') {
+                        uniqueVals[val] = true;
+                    }
+                });
+                
+                var sortedVals = Object.keys(uniqueVals).sort();
+                
+                selectEl.innerHTML = '<option value="">All</option>';
+                sortedVals.forEach(function(val) {
+                    var opt = document.createElement('option');
+                    opt.value = val;
+                    opt.innerText = val;
+                    selectEl.appendChild(opt);
+                });
+            }
+        }
+
+        function syncTopGradeFilter() {
+            var val = document.getElementById('seniorityGradeFilter').value;
+            var filterGradeEl = document.getElementById('filter-grade');
+            if (filterGradeEl) {
+                filterGradeEl.value = (val === "ALL") ? "" : val;
+            }
+            applyFilters();
+        }
+
+        function applyFilters() {
+            var textFilters = {
+                'employeeId': document.getElementById('filter-employeeId').value.toLowerCase(),
+                'employeeName': document.getElementById('filter-employeeName').value.toLowerCase(),
+                'dob': document.getElementById('filter-dob').value.toLowerCase(),
+                'retDate': document.getElementById('filter-retDate').value.toLowerCase(),
+                'doj': document.getElementById('filter-doj').value.toLowerCase(),
+                'doa': document.getElementById('filter-doa').value.toLowerCase(),
+                'promoDate': document.getElementById('filter-promoDate').value.toLowerCase(),
+                'remarks': document.getElementById('filter-remarks').value.toLowerCase()
+            };
+            
+            var selectFilters = {
+                'division': document.getElementById('filter-division').value,
+                'complex': document.getElementById('filter-complex').value,
+                'discipline': document.getElementById('filter-discipline').value,
+                'grade': document.getElementById('filter-grade').value,
+                'gender': document.getElementById('filter-gender').value,
+                'exDtMt': document.getElementById('filter-exDtMt').value,
+                'exServicemen': document.getElementById('filter-exServicemen').value,
+                'php': document.getElementById('filter-php').value,
+                'category': document.getElementById('filter-category').value,
+                'qualification': document.getElementById('filter-qualification').value,
+                'designation': document.getElementById('filter-designation').value
+            };
 
             var rankedList = calculateSeniority();
 
-            // Filter by grade if selected
-            if (selectedGrade !== "ALL") {
-                rankedList = rankedList.filter(function(emp) {
-                    return emp.grade === selectedGrade;
-                });
-            }
-
-            var table = document.getElementById("seniorityTable");
-            if (!table) return;
-
-            var activeInfo = getActiveGradesJS(rankedList, selectedGrade);
-            var activeGrades = activeInfo.active;
-            var activeGradesCount = activeInfo.count;
-
-            // Rebuild the THEAD
-            var headerHtml = 
-                "<thead>" +
-                "  <tr>" +
-                "    <th rowspan='2' style='width: 80px; text-align: center; vertical-align: middle;'>Rank</th>" +
-                "    <th rowspan='2' style='vertical-align: middle;'>Employee ID</th>" +
-                "    <th rowspan='2' style='vertical-align: middle;'>Employee Name</th>" +
-                "    <th rowspan='2' style='vertical-align: middle;'>Grade</th>";
-            if (activeGradesCount > 0) {
-                headerHtml += "    <th colspan='" + activeGradesCount + "' style='text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);'>Promotion Dates per Grade (Position)</th>";
-            }
-            headerHtml +=
-                "    <th rowspan='2' style='vertical-align: middle;'>Date of Joining</th>" +
-                "    <th rowspan='2' style='vertical-align: middle;'>Date of Birth</th>" +
-                "    <th rowspan='2' style='vertical-align: middle;'>Retirement Date</th>" +
-                "    <th rowspan='2' style='vertical-align: middle;'>Department</th>" +
-                "    <th rowspan='2' style='vertical-align: middle;'>Designation</th>" +
-                "  </tr>" +
-                "  <tr>";
-            for (var g = 10; g >= 1; g--) {
-                if (activeGrades[g]) {
-                    var dName = getDesignationForGradeJS("Grade " + g);
-                    var shortD = dName.indexOf("(") > -1 ? dName.substring(dName.indexOf("(")+1, dName.indexOf(")")) : dName;
-                    headerHtml += "    <th style='font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 90px;'>Gr " + g + "<br><span style='font-size:0.7rem; font-weight:normal; opacity:0.85;'>" + shortD + "</span></th>";
-                }
-            }
-            headerHtml += "  </tr>" +
-                          "</thead>";
-
-            var existingThead = table.querySelector("thead");
-            if (existingThead) table.removeChild(existingThead);
-            table.insertAdjacentHTML('afterbegin', headerHtml);
-
-            var tbody = document.getElementById("seniorityTableBody");
-            tbody.innerHTML = "";
-
-            if (rankedList.length === 0) {
-                var totalCols = 9 + activeGradesCount;
-                tbody.innerHTML = "<tr><td colspan='" + totalCols + "' style='text-align: center; color: var(--text-light); padding: 2rem;'>No employee records found in this grade category.</td></tr>";
-                return;
-            }
-
-            rankedList.forEach(function(emp, index) {
-                var tr = document.createElement("tr");
-                
-                var gradeCols = "";
-                for (var g = 10; g >= 1; g--) {
-                    if (activeGrades[g]) {
-                        var pDate = getPromotionDateForGrade(emp, "Grade " + g);
-                        gradeCols += "<td style='text-align: center; font-size: 0.85rem;'>" + (pDate ? formatDate(pDate) : "-") + "</td>";
-                    }
-                }
-                
+            filteredEmployees = rankedList.filter(function(emp) {
+                // Compute retirement date string for filtering
                 var dobDate = new Date(emp.dateOfBirth);
                 var retDateStr = "N/A";
                 if (!isNaN(dobDate.getTime())) {
                     var retYear = dobDate.getFullYear() + 60;
                     var retMonth = dobDate.getMonth();
                     var lastDay = new Date(retYear, retMonth + 1, 0).getDate();
+                    if (dobDate.getDate() === 1) {
+                        var prevMonthDate = new Date(retYear, retMonth, 0);
+                        retYear = prevMonthDate.getFullYear();
+                        retMonth = prevMonthDate.getMonth();
+                        lastDay = prevMonthDate.getDate();
+                    }
                     var mStr = (retMonth + 1) < 10 ? "0" + (retMonth + 1) : (retMonth + 1);
                     var dStr = lastDay < 10 ? "0" + lastDay : lastDay;
                     retDateStr = formatDate(retYear + "-" + mStr + "-" + dStr);
                 }
+                emp.retDate = retDateStr;
 
+                // Apply text filters
+                for (var key in textFilters) {
+                    var q = textFilters[key];
+                    if (q !== '') {
+                        var val = emp[key] ? emp[key].toLowerCase() : '';
+                        if (key === 'dob' || key === 'doj' || key === 'doa' || key === 'promoDate') {
+                            val = formatDate(emp[key]).toLowerCase();
+                        }
+                        if (val.indexOf(q) === -1) return false;
+                    }
+                }
+                
+                // Apply select filters
+                for (var key in selectFilters) {
+                    var q = selectFilters[key];
+                    if (q !== '') {
+                        var val = emp[key] ? emp[key] : '';
+                        if (val !== q) return false;
+                    }
+                }
+                return true;
+            });
+            
+            // Sync top select dropdown
+            var gradeVal = document.getElementById('filter-grade').value;
+            var topSelect = document.getElementById('seniorityGradeFilter');
+            if (topSelect) {
+                topSelect.value = (gradeVal === "") ? "ALL" : gradeVal;
+            }
+            
+            // Update title
+            var titleEl = document.getElementById('seniorityTableTitle');
+            if (titleEl) {
+                titleEl.innerText = gradeVal === "" 
+                    ? "Organization-Wide Seniority Listings" 
+                    : gradeVal + " Seniority Rankings";
+            }
+
+            // Dynamic display of Seniority in Grades columns
+            var maxGradeVisible = 10;
+            if (gradeVal && gradeVal.indexOf("Grade ") === 0) {
+                var num = parseInt(gradeVal.substring(6));
+                if (!isNaN(num) && num >= 1 && num <= 10) {
+                    maxGradeVisible = num;
+                }
+            }
+
+            var headerEl = document.getElementById('seniorityInGradesHeader');
+            if (headerEl) {
+                headerEl.colSpan = maxGradeVisible;
+                headerEl.style.display = maxGradeVisible > 0 ? '' : 'none';
+            }
+
+            for (var g = 1; g <= 10; g++) {
+                var thEl = document.getElementById('th-grade-' + g);
+                if (thEl) {
+                    thEl.style.display = (g <= maxGradeVisible) ? '' : 'none';
+                }
+                var filterThEl = document.getElementById('th-filter-grade-' + g);
+                if (filterThEl) {
+                    filterThEl.style.display = (g <= maxGradeVisible) ? '' : 'none';
+                }
+            }
+
+            currentPage = 1;
+            renderSeniorityTableRows();
+        }
+
+        function renderSeniorityTable() {
+            populateFilterOptions();
+            applyFilters();
+        }
+
+        function renderSeniorityTableRows() {
+            var tbody = document.getElementById('seniorityTableBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            var totalRecords = filteredEmployees.length;
+            var startIdx = (currentPage - 1) * pageSize;
+            var endIdx = startIdx + pageSize;
+            if (endIdx > totalRecords) endIdx = totalRecords;
+            
+            document.getElementById('displayCountLabel').innerText = 'Showing ' + (totalRecords > 0 ? (startIdx + 1) : 0) + ' to ' + endIdx + ' of ' + totalRecords + ' records';
+            
+            // Dynamic display of Seniority in Grades columns count
+            var maxGradeVisible = 10;
+            var gradeVal = document.getElementById('filter-grade').value; // e.g. "Grade 5"
+            if (gradeVal && gradeVal.indexOf("Grade ") === 0) {
+                var num = parseInt(gradeVal.substring(6));
+                if (!isNaN(num) && num >= 1 && num <= 10) {
+                    maxGradeVisible = num;
+                }
+            }
+            
+            if (totalRecords === 0) {
+                tbody.innerHTML = '<tr><td colspan="' + (20 + maxGradeVisible) + '" style="text-align: center; color: var(--text-light); padding: 2rem;">No employee records match the filters.</td></tr>';
+                updatePaginationControls(totalRecords);
+                return;
+            }
+            
+            var pageList = filteredEmployees.slice(startIdx, endIdx);
+            
+            pageList.forEach(function(emp, index) {
+                var tr = document.createElement('tr');
+                
+                var gradeCols = '';
+                for (var g = 1; g <= maxGradeVisible; g++) {
+                    var pd = getPromotionDateForGrade(emp, 'Grade ' + g);
+                    gradeCols += '<td style="text-align: center; font-size: 0.85rem;">' + (pd ? formatDate(pd) : '-') + '</td>';
+                }
+                
+                // Determine salutation based on gender
+                var salutation = "S/Shri";
+                if (emp.gender) {
+                    var gLower = emp.gender.trim().toLowerCase();
+                    if (gLower === 'male' || gLower === 'm') {
+                        salutation = "Shri";
+                    } else if (gLower === 'female' || gLower === 'f') {
+                        salutation = "Smt.";
+                    }
+                }
+                
                 tr.innerHTML = 
-                    "<td style='text-align: center;'><strong>" + (index + 1) + "</strong></td>" +
-                    "<td><strong>" + emp.employeeId + "</strong></td>" +
-                    "<td>" + emp.employeeName + "</td>" +
-                    "<td>" + emp.grade + "</td>" +
+                    '<td style="text-align: center;"><strong>' + (startIdx + index + 1) + '</strong></td>' +
+                    '<td>' + (emp.division || '') + '</td>' +
+                    '<td>' + (emp.complex || '') + '</td>' +
+                    '<td><strong>' + (emp.employeeId || '') + '</strong></td>' +
+                    '<td>' + salutation + ' ' + (emp.employeeName || '') + '</td>' +
+                    '<td>' + (emp.discipline || '') + '</td>' +
+                    '<td>' + (emp.designation || '') + '</td>' +
+                    '<td>' + (emp.grade || '') + '</td>' +
+                    '<td>' + (emp.gender || '') + '</td>' +
+                    '<td>' + (emp.exDtMt || '') + '</td>' +
+                    '<td>' + (emp.exServicemen || '') + '</td>' +
+                    '<td>' + (emp.php || '') + '</td>' +
+                    '<td>' + (emp.category || '') + '</td>' +
+                    '<td>' + formatDate(emp.dateOfBirth) + '</td>' +
+                    '<td>' + (emp.retDate || 'N/A') + '</td>' +
+                    '<td>' + formatDate(emp.dateOfJoining) + '</td>' +
+                    '<td>' + (emp.dateOfAbsorption ? formatDate(emp.dateOfAbsorption) : '-') + '</td>' +
+                    '<td>' + (emp.promotionDate ? formatDate(emp.promotionDate) : '-') + '</td>' +
                     gradeCols +
-                    "<td>" + formatDate(emp.dateOfJoining) + "</td>" +
-                    "<td>" + formatDate(emp.dateOfBirth) + "</td>" +
-                    "<td>" + retDateStr + "</td>" +
-                    "<td>" + emp.department + "</td>" +
-                    "<td>" + (emp.designation ? expandDesignation(emp.designation) : "") + "</td>";
+                    '<td>' + (emp.qualification || '') + '</td>' +
+                    '<td>' + (emp.remarks || '') + '</td>';
+                    
                 tbody.appendChild(tr);
             });
+            
+            updatePaginationControls(totalRecords);
+        }
+
+        function updatePaginationControls(totalRecords) {
+            var totalPages = Math.ceil(totalRecords / pageSize);
+            var prevBtn = document.getElementById('prevPageBtn');
+            var nextBtn = document.getElementById('nextPageBtn');
+            var pageLabel = document.getElementById('currentPageLabel');
+            
+            pageLabel.innerText = 'Page ' + currentPage + ' of ' + (totalPages > 0 ? totalPages : 1);
+            
+            prevBtn.disabled = (currentPage === 1);
+            nextBtn.disabled = (currentPage === totalPages || totalPages === 0);
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderSeniorityTableRows();
+            }
+        }
+
+        function nextPage() {
+            var totalPages = Math.ceil(filteredEmployees.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderSeniorityTableRows();
+            }
+        }
+
+        function changePageSize() {
+            var selectSize = document.getElementById('pageSizeSelect').value;
+            if (selectSize === 'ALL') {
+                pageSize = filteredEmployees.length > 0 ? filteredEmployees.length : 50;
+            } else {
+                pageSize = parseInt(selectSize);
+            }
+            currentPage = 1;
+            renderSeniorityTableRows();
         }
 
         // 7. Form Operations (CRUD Logic)
