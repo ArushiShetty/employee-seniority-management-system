@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HAL HR Seniority Management System</title>
+    <style>
+        :root {
+            --hal-navy: #0A2540;
+            --hal-blue: #004b87;
+            --hal-accent: #007bc4;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --bg-light: #f7fafc;
+            --bg-card: #ffffff;
+            --border-color: #cbd5e0;
+            --danger-red: #e53e3e;
+            --success-green: #38a169;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* --- SCREEN SWITCHING --- */
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        #appLayout.active {
+            display: flex;
+        }
+
+        /* --- LOGIN PAGE --- */
+        .login-wrapper {
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--hal-navy);
+        }
+        #loginScreen.active {
+            display: flex;
+        }
+
+        .login-card {
+            background: #ffffff;
+            padding: 2.5rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: var(--hal-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- LAYOUT STRUCTURE --- */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--hal-navy);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sidebar-item a {
+            display: block;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item a:hover,
+        .sidebar-item.active a {
+            background-color: var(--hal-blue);
+            color: #ffffff;
+            padding-left: 1.25rem;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            background-color: #ffffff;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .top-bar-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--hal-navy);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background-color: #e2e8f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--hal-navy);
+        }
+
+        .btn-logout {
+            color: #e53e3e;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .page-container {
+            padding: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* --- CARDS & STATS --- */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--hal-navy);
+            margin-bottom: 1.25rem;
+            border-bottom: 2px solid var(--bg-light);
+            padding-bottom: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 75, 135, 0.12);
+            border-color: var(--hal-blue);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            font-weight: bold;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+
+        /* --- HAL JET ANIMATIONS --- */
+        @keyframes jetFloat {
+            0% { transform: translateY(0) rotate(-35deg) scale(1); }
+            50% { transform: translateY(-8px) rotate(-33deg) scale(1.03); }
+            100% { transform: translateY(0) rotate(-35deg) scale(1); }
+        }
+        .jet-animated {
+            animation: jetFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes jetGlide {
+            0% { transform: translate(-100px, 10px) rotate(45deg) scale(0.6); opacity: 0; }
+            30% { opacity: 0.25; }
+            100% { transform: translate(120px, -10px) rotate(45deg) scale(0.8); opacity: 0; }
+        }
+        .jet-glide {
+            animation: jetGlide 3.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            animation-delay: 0.5s;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--hal-navy);
+        }
+
+        /* --- DATA TABLES --- */
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .data-table th {
+            background-color: var(--hal-navy);
+            color: #ffffff;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: bold;
+            border: 1px solid var(--hal-navy);
+        }
+
+        .data-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background-color: var(--bg-light);
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #ebf8ff;
+        }
+
+        /* --- FORMS & BUTTONS --- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            padding: 0.625rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            width: 100%;
+            outline: none;
+            background-color: #ffffff;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1.25rem;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: var(--hal-blue);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--hal-navy);
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: var(--text-dark);
+            border-color: var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: #cbd5e0;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-red);
+            color: #ffffff;
+        }
+
+        .btn-danger:hover {
+            background-color: #b7791f;
+        }
+
+        .actions-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .error-message {
+            background-color: #fff5f5;
+            border-left: 4px solid var(--danger-red);
+            color: var(--danger-red);
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        /* --- PRINT CSS --- */
+        @media print {
+            .sidebar, .top-bar, .actions-bar, .btn, .no-print, form {
+                display: none !important;
+            }
+            .main-content {
+                padding: 0 !important;
+            }
+            .page-container {
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+            }
+            .data-table th {
+                background-color: #f2f2f2 !important;
+                color: #000000 !important;
+                border: 1px solid #000000 !important;
+                white-space: normal !important;
+            }
+            .data-table td {
+                border: 1px solid #000000 !important;
+                white-space: normal !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== SCREEN 1: LOGIN ==================== -->
+    <div id="loginScreen" class="screen active login-wrapper">
+        <div class="login-card">
+            <div class="login-header" style="text-align: center;">
+                <img src="WebContent/images/hal-logo.png" alt="HAL Logo" style="width: 100%; max-width: 360px; height: auto; display: block; margin: 0 auto 1.5rem auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+                <div class="login-logo" style="color: var(--hal-navy); font-size: 1.5rem; font-weight: bold; line-height: 1.2; margin-bottom: 0.25rem;">HAL Overhaul Division</div>
+                <div style="font-size: 0.9rem; color: var(--text-light); font-weight: bold;">HR Seniority Management System</div>
+            </div>
+
+            <div id="loginError" class="error-message">Invalid Username or Password!</div>
+
+            <form id="loginForm">
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter 'admin'">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter 'admin123'">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem;">Login Securely</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN APPLICATION LAYOUT ==================== -->
+    <div id="appLayout" class="screen app-container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" style="position: relative; overflow: hidden;">
+            <!-- Jet watermark inside sidebar -->
+            <svg class="jet-animated" style="position: absolute; bottom: -20px; right: -20px; width: 120px; height: 120px; opacity: 0.05; transform-origin: center; color: #ffffff; pointer-events: none;" viewBox="0 0 100 100" fill="currentColor">
+                <path d="M50 5 L53 25 L85 55 L85 62 L54 50 L53 85 L65 92 L65 95 L50 90 L35 95 L35 92 L47 85 L46 50 L15 62 L15 55 L47 25 Z" />
+            </svg>
+            <div class="sidebar-brand" style="display: flex; align-items: center; justify-content: center; padding: 0.5rem; background: #ffffff; border-radius: 6px; margin: 0 0.5rem 1.5rem 0.5rem; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                <img src="WebContent/images/hal-logo.png" alt="HAL Logo" style="max-width: 100%; height: auto; max-height: 38px;">
+            </div>
+            <ul class="sidebar-menu">
+                <li class="sidebar-item" id="nav-dashboard"><a onclick="switchScreen('dashboardScreen')">Dashboard</a></li>
+                <li class="sidebar-item" id="nav-seniority"><a onclick="switchScreen('seniorityScreen')">Seniority Engine</a></li>
+                <li class="sidebar-item" id="nav-roster"><a onclick="switchScreen('rosterScreen')">Employee Roster</a></li>
+                <li class="sidebar-item" id="nav-add"><a onclick="showAddForm()">Add Employee</a></li>
+                <li class="sidebar-item" style="margin-top: auto;"><a onclick="handleLogout()" class="btn-logout" style="color: #ff8888;">Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Header Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-title" id="pageTitle">HR Seniority Portal - Overhaul Division</div>
+                <div class="user-profile">
+                    <span class="user-badge" id="userRoleBadge">ADMIN</span>
+                    <span>Welcome, <strong id="userNameLabel">HR Administrator</strong></span>
+                </div>
+            </div>
+
+            <!-- Page Containers -->
+            <div class="page-container">
+
+                <!-- ==================== SCREEN 2: DASHBOARD ==================== -->
+                <div id="dashboardScreen" class="screen">
+                    <div style="margin-bottom: 2rem; position: relative; overflow: hidden;">
+                        <h2 style="color: var(--hal-navy); font-weight: 700;">HR Management Portal</h2>
+                        <p style="color: var(--text-light);">Hindustan Aeronautics Limited - Overhaul Division, Bangalore</p>
+                        <!-- Jet silhouette that glides across title when page loads -->
+                        <div style="position: absolute; right: 0; top: 0; width: 100px; height: 40px; overflow: hidden; pointer-events: none;">
+                            <svg class="jet-glide" viewBox="0 0 100 100" fill="currentColor" style="width: 24px; height: 24px; color: var(--hal-blue); opacity: 0.15; transform: rotate(90deg);">
+                                <path d="M50 5 L53 25 L85 55 L85 62 L54 50 L53 85 L65 92 L65 95 L50 90 L35 95 L35 92 L47 85 L46 50 L15 62 L15 55 L47 25 Z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-label">Total Employee Files</span>
+                            <span class="stat-value" id="statTotalEmployees">6</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Authorized HR Operators</span>
+                            <span class="stat-value">2</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Active Grades</span>
+                            <span class="stat-value">10</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">Quick HR Operations</h3>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button onclick="switchScreen('seniorityScreen')" class="btn btn-primary">Open Seniority Engine</button>
+                            <button onclick="switchScreen('rosterScreen')" class="btn btn-secondary">Search & View Roster</button>
+                            <button onclick="showAddForm()" class="btn btn-secondary">Register New Employee</button>
+                        </div>
+                    </div>
+
+                    <div class="card" style="border-left: 4px solid var(--hal-accent);">
+                        <h4 style="color: var(--hal-navy); margin-bottom: 0.5rem; font-weight: 600;">System Guidelines</h4>
+                        <p style="font-size: 0.9rem; color: var(--text-dark);">
+                            This offline browser application demonstrates seniority calculation algorithms. All data is saved inside your browser session and does not require active server connections.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ==================== SCREEN 3: ROSTER ==================== -->
+                <div id="rosterScreen" class="screen">
+                    <div class="actions-bar">
+                        <div>
+                            <h2 style="color: var(--hal-navy); font-weight: 700;">Active Employees Roster</h2>
+                            <p style="color: var(--text-light); font-size: 0.9rem;">Maintain active profiles and trace administrative parameters.</p>
+                        </div>
+                        <div>
+                            <button onclick="showAddForm()" class="btn btn-primary">+ Add New Employee</button>
+                        </div>
+                    </div>
+
+                    <!-- Search Input -->
+                    <div class="card" style="padding: 1rem;">
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <input type="text" id="rosterSearchInput" class="form-control" placeholder="Search by ID, Name, Department..." onkeyup="filterRosterTable()">
+                        </div>
+                    </div>
+
+                    <!-- Roster Table Card -->
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 class="card-title" style="margin-bottom: 0; border: none;">Employee Directory</h3>
+                            <button onclick="exportCSV('rosterTable', 'hal_employee_roster.csv')" class="btn btn-secondary">Export to CSV</button>
+                        </div>
+
+                        <div class="table-responsive">
+                             <table class="data-table" id="rosterTable">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" style="vertical-align: middle;">Employee ID</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Full Name</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Grade</th>
+                                        <th colspan="10" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Promotion Dates per Grade (Position)</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Date of Joining</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Date of Birth</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Retirement Date</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Department</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Designation</th>
+                                        <th rowspan="2" class="no-print" style="width: 120px; text-align: center; vertical-align: middle;">Actions</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 10</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 9</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 8</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 7</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 6</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 5</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 4</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 3</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 2</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 1</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rosterTableBody">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== SCREEN 4: FORM ==================== -->
+                <div id="formScreen" class="screen">
+                    <div class="actions-bar">
+                        <div>
+                            <h2 style="color: var(--hal-navy); font-weight: 700;" id="formTitle">Add New Employee Profile</h2>
+                            <p style="color: var(--text-light); font-size: 0.9rem;">Fill in the master data fields. Parameters affect seniority sorting.</p>
+                        </div>
+                        <div>
+                            <button onclick="switchScreen('rosterScreen')" class="btn btn-secondary">&larr; Return to Roster</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">Employee Profile Parameters</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Employee ID</label>
+                                <input type="text" id="formEmployeeId" class="form-control" placeholder="e.g. 120016">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" id="formEmployeeName" class="form-control" placeholder="Enter Full Name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Department</label>
+                                <input type="text" id="formDepartment" class="form-control" placeholder="e.g. LCA, Jet Engine">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Designation</label>
+                                <input type="text" id="formDesignation" class="form-control" placeholder="e.g. General Manager, Additional General Manager">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Grade</label>
+                                <select id="formGrade" class="form-control">
+                                    <option value="Grade 1">Grade 1</option>
+                                    <option value="Grade 2">Grade 2</option>
+                                    <option value="Grade 3">Grade 3</option>
+                                    <option value="Grade 4" selected>Grade 4</option>
+                                    <option value="Grade 5">Grade 5</option>
+                                    <option value="Grade 6">Grade 6</option>
+                                    <option value="Grade 7">Grade 7</option>
+                                    <option value="Grade 8">Grade 8</option>
+                                    <option value="Grade 9">Grade 9</option>
+                                    <option value="Grade 10">Grade 10</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Level Within Grade</label>
+                                <select id="formLevel" class="form-control">
+                                    <option value="Level 1" selected>Level 1</option>
+                                    <option value="Level 2">Level 2</option>
+                                    <option value="Level 3">Level 3</option>
+                                    <option value="Level 4">Level 4</option>
+                                    <option value="Level 5">Level 5</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" id="formDOB" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Date of Joining</label>
+                                <input type="date" id="formDOJ" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Current Grade Promotion Date</label>
+                                <input type="date" id="formPromotionDate" class="form-control">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                            <button onclick="saveEmployee()" class="btn btn-primary">Save Record</button>
+                            <button onclick="switchScreen('rosterScreen')" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== SCREEN 5: SENIORITY SCREEN ==================== -->
+                <div id="seniorityScreen" class="screen">
+                    <div class="actions-bar">
+                        <div>
+                            <h2 style="color: var(--hal-navy); font-weight: 700;">Dynamic Seniority Rankings</h2>
+                            <p style="color: var(--text-light); font-size: 0.9rem;">Rankings are computed dynamically using the 7-level fallback seniority algorithm.</p>
+                        </div>
+                        <div class="no-print" style="display: flex; gap: 0.5rem;">
+                            <button onclick="window.print()" class="btn btn-secondary">Print Report / PDF</button>
+                            <button onclick="exportCSV('seniorityTable', 'hal_seniority_list.csv')" class="btn btn-primary">Download CSV</button>
+                        </div>
+                    </div>
+
+                    <!-- Grade Filter dropdown -->
+                    <div class="card no-print">
+                        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                            <label class="form-label" style="margin-bottom: 0;">Filter Seniority List by Grade:</label>
+                             <select id="seniorityGradeFilter" class="form-control" style="max-width: 320px;" onchange="renderSeniorityTable()">
+                                <option value="ALL" selected>All Grades (Global Ranks)</option>
+                                <option value="Grade 1">Grade 1 (Trainee / Assistant Engineer)</option>
+                                <option value="Grade 2">Grade 2 (Engineer / Officer)</option>
+                                <option value="Grade 3">Grade 3 (Assistant Manager)</option>
+                                <option value="Grade 4">Grade 4 (Deputy Manager)</option>
+                                <option value="Grade 5">Grade 5 (Manager)</option>
+                                <option value="Grade 6">Grade 6 (Senior Manager)</option>
+                                <option value="Grade 7">Grade 7 (Chief Manager)</option>
+                                <option value="Grade 8">Grade 8 (Deputy General Manager)</option>
+                                <option value="Grade 9">Grade 9 (Additional General Manager)</option>
+                                <option value="Grade 10">Grade 10 (General Manager)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Seniority Listing Card -->
+                    <div class="card">
+                        <h3 class="card-title" id="seniorityTableTitle">Organization-Wide Seniority Listings</h3>
+
+                        <div class="table-responsive">
+                             <table class="data-table" id="seniorityTable">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2" style="width: 80px; text-align: center; vertical-align: middle;">Rank</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Employee ID</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Employee Name</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Grade</th>
+                                        <th colspan="10" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Promotion Dates per Grade (Position)</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Date of Joining</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Date of Birth</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Retirement Date</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Department</th>
+                                        <th rowspan="2" style="vertical-align: middle;">Designation</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 10</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 9</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 8</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 7</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 6</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 5</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 4</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 3</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 2</th>
+                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 80px;">Gr 1</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="seniorityTableBody">
+                                    <!-- Populated dynamically via JS sorting engine -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT STATE ENGINE ==================== -->
+    <script type="text/javascript">
+        
+        // 1. Initial Seeding of Spreadsheet Test Data
+        var defaultEmployees = [
+            {
+                employeeId: "103225",
+                employeeName: "Rajesh Kumar Sharma",
+                grade: "Grade 9",
+                empLevel: "Level 2",
+                promotionDate: "2025-07-01",
+                dateOfJoining: "1995-07-01",
+                dateOfBirth: "1970-04-12",
+                department: "LCA Division",
+                designation: "Additional General Manager",
+                history: [
+                    { grade: "Grade 8", promoDate: "2015-07-01" },
+                    { grade: "Grade 9", promoDate: "2025-07-01" }
+                ]
+            },
+            {
+                employeeId: "103499",
+                employeeName: "M. Visvesvaraya",
+                grade: "Grade 10",
+                empLevel: "Level 3",
+                promotionDate: "2025-07-01",
+                dateOfJoining: "1992-06-01",
+                dateOfBirth: "1967-11-20",
+                department: "Overhaul Division",
+                designation: "General Manager",
+                history: [
+                    { grade: "Grade 9", promoDate: "2020-07-01" },
+                    { grade: "Grade 10", promoDate: "2025-07-01" }
+                ]
+            },
+            {
+                employeeId: "104725",
+                employeeName: "Sunil Dev",
+                grade: "Grade 7",
+                empLevel: "Level 1",
+                promotionDate: "2024-07-01",
+                dateOfJoining: "2005-01-01",
+                dateOfBirth: "1980-08-15",
+                department: "Services Dept",
+                designation: "Chief Manager",
+                history: [
+                    { grade: "Grade 5", promoDate: "2013-07-01" },
+                    { grade: "Grade 6", promoDate: "2019-07-01" },
+                    { grade: "Grade 7", promoDate: "2024-07-01" }
+                ]
+            },
+            {
+                employeeId: "120016",
+                employeeName: "Anil K. V.",
+                grade: "Grade 4",
+                empLevel: "Level 1",
+                promotionDate: "2023-01-01",
+                dateOfJoining: "2012-12-14",
+                dateOfBirth: "1992-05-05",
+                department: "Jet Engine Overhaul",
+                designation: "Highly Skilled Technician",
+                history: [
+                    { grade: "Grade 1", promoDate: "2012-12-14" },
+                    { grade: "Grade 2", promoDate: "2012-12-14" },
+                    { grade: "Grade 3", promoDate: "2017-01-01" },
+                    { grade: "Grade 4", promoDate: "2023-01-01" }
+                ]
+            },
+            {
+                employeeId: "120018",
+                employeeName: "Balaji Prasad",
+                grade: "Grade 4",
+                empLevel: "Level 1",
+                promotionDate: "2023-01-01",
+                dateOfJoining: "2012-12-17",
+                dateOfBirth: "1991-03-14",
+                department: "Jet Engine Overhaul",
+                designation: "Highly Skilled Technician",
+                history: [
+                    { grade: "Grade 1", promoDate: "2012-12-17" },
+                    { grade: "Grade 2", promoDate: "2012-12-17" },
+                    { grade: "Grade 3", promoDate: "2017-01-01" },
+                    { grade: "Grade 4", promoDate: "2023-01-01" }
+                ]
+            },
+            {
+                employeeId: "120020",
+                employeeName: "Chinnaswamy M.",
+                grade: "Grade 4",
+                empLevel: "Level 1",
+                promotionDate: "2023-01-01",
+                dateOfJoining: "2012-12-26",
+                dateOfBirth: "1990-10-10",
+                department: "Jet Engine Overhaul",
+                designation: "Highly Skilled Technician",
+                history: [
+                    { grade: "Grade 1", promoDate: "2012-12-26" },
+                    { grade: "Grade 2", promoDate: "2012-12-26" },
+                    { grade: "Grade 3", promoDate: "2017-01-01" },
+                    { grade: "Grade 4", promoDate: "2023-01-01" }
+                ]
+            }
+        ];
+
+        // Programmatically generate 10 employees for every grade (Grade 1 to 10) to match Java backend exactly
+        (function() {
+            var firstNames = ["Amit", "Rohan", "Sanjay", "Karan", "Vijay", "Anand", "Deepak", "Vikram", "Sunil", "Rajesh", "Manoj", "Pradeep", "Ashok", "Suresh", "Ramesh", "Ajay", "Dinesh", "Harish", "Arvind", "Sandeep"];
+            var lastNames = ["Patil", "Nair", "Joshi", "Iyer", "Rao", "Reddy", "Mehta", "Gowda", "Mishra", "Gupta", "Sen", "Bose", "Das", "Roy", "Nair", "Kumar", "Sharma", "Singh", "Prasad", "Verma"];
+            var depts = ["LCA Assembly", "Overhaul Engine", "Jet Avionics", "Services Maintenance", "Purchase Logistics", "Information Systems", "Finance Accounting", "Human Resources"];
+            
+            var olderNames = [
+                "",
+                "Aarav Patil",
+                "Rohan Nair",
+                "Sanjay Joshi",
+                "Karan Iyer",
+                "Vijay Rao",
+                "Anand Reddy",
+                "Deepak Mehta",
+                "Vikram Gowda",
+                "Sunil Mishra",
+                "Rajesh Gupta"
+            ];
+            var youngerNames = [
+                "",
+                "Alok Deshmukh",
+                "Rahul Pillai",
+                "Sandeep Kulkarni",
+                "Kunal Menon",
+                "Varun Hegde",
+                "Arjun Naidu",
+                "Dinesh Shah",
+                "Vinay Shettigar",
+                "Suresh Pandey",
+                "Ramesh Bansal"
+            ];
+            
+            for (var g = 1; g <= 10; g++) {
+                for (var k = 0; k < 12; k++) {
+                    var empIdInt = 120000 + (g * 100) + k;
+                    var empIdStr = String(empIdInt);
+                    
+                    var firstName, lastName, fullName, dept, careerDurationYears, currentPromoYear, joinYear, doj, dob;
+                    careerDurationYears = (g - 1) * 3;
+                    
+                    if (k >= 10) {
+                        dept = "Overhaul Engine";
+                        currentPromoYear = 2022;
+                        joinYear = currentPromoYear - careerDurationYears;
+                        doj = joinYear + "-05-15";
+                        
+                        if (k === 10) {
+                            fullName = olderNames[g];
+                            dob = (joinYear - 28) + "-04-12";
+                        } else {
+                            fullName = youngerNames[g];
+                            dob = (joinYear - 24) + "-08-25";
+                        }
+                    } else {
+                        firstName = firstNames[(g * k + k) % firstNames.length];
+                        lastName = lastNames[(g * k + g) % lastNames.length];
+                        fullName = firstName + " " + lastName;
+                        dept = depts[(g + k) % depts.length];
+                        
+                        currentPromoYear = 2020 + (k % 6);
+                        joinYear = currentPromoYear - careerDurationYears;
+                        
+                        var joinMonth = 1 + (k % 12);
+                        var joinDay = 1 + (k * 7) % 28;
+                        var joinMonthStr = joinMonth < 10 ? "0" + joinMonth : "" + joinMonth;
+                        var joinDayStr = joinDay < 10 ? "0" + joinDay : "" + joinDay;
+                        doj = joinYear + "-" + joinMonthStr + "-" + joinDayStr;
+                        
+                        var birthYear = joinYear - 22 - (k % 5);
+                        var birthMonth = 1 + ((k + 3) % 12);
+                        var birthDay = 1 + ((k * 3) % 28);
+                        var birthMonthStr = birthMonth < 10 ? "0" + birthMonth : "" + birthMonth;
+                        var birthDayStr = birthDay < 10 ? "0" + birthDay : "" + birthDay;
+                        dob = birthYear + "-" + birthMonthStr + "-" + birthDayStr;
+                    }
+                    
+                    var history = [];
+                    var lastDesig = "";
+                    var lastPromoDate = "";
+                    
+                    for (var pg = 1; pg <= g; pg++) {
+                        var promoYear = joinYear + (pg - 1) * 3;
+                        var pDate = promoYear + "-07-01";
+                        
+                        var des = "Associate Grade " + pg;
+                        if (pg === 1) des = "Trainee (" + dept + ")";
+                        else if (pg === 2) des = "Technician (" + dept + ")";
+                        else if (pg === 3) des = "Senior Technician";
+                        else if (pg === 4) des = "Highly Skilled Technician";
+                        else if (pg === 5) des = "Deputy Manager";
+                        else if (pg === 6) des = "Manager";
+                        else if (pg === 7) des = "Senior Manager";
+                        else if (pg === 8) des = "Chief Manager";
+                        else if (pg === 9) des = "Deputy General Manager";
+                        else if (pg === 10) des = "General Manager";
+                        
+                        history.push({
+                            grade: "Grade " + pg,
+                            promoDate: pDate
+                        });
+                        
+                        if (pg === g) {
+                            lastDesig = des;
+                            lastPromoDate = pDate;
+                        }
+                    }
+                    
+                    defaultEmployees.push({
+                        employeeId: empIdStr,
+                        employeeName: fullName,
+                        grade: "Grade " + g,
+                        empLevel: "Level " + (1 + (k % 3)),
+                        promotionDate: lastPromoDate,
+                        dateOfJoining: doj,
+                        dateOfBirth: dob,
+                        department: dept,
+                        designation: lastDesig,
+                        history: history
+                    });
+                }
+            }
+        })();
+
+        // Load employees from browser localStorage, or use default seed data if empty
+        var employees = null;
+        try {
+            employees = JSON.parse(localStorage.getItem("hal_employees"));
+        } catch (e) {
+            console.warn("localStorage access is restricted on local file protocol. Using temporary in-memory storage.");
+        }
+
+        if (!employees) {
+            employees = defaultEmployees;
+            try {
+                localStorage.setItem("hal_employees", JSON.stringify(employees));
+            } catch (e) {}
+        } else {
+            // Merge/Sync default employees (like M. Visvesvaraya) to ensure cached profiles are fully updated with history
+            var modified = false;
+            defaultEmployees.forEach(function(de) {
+                var existingEmp = employees.find(function(emp) {
+                    return emp.employeeId === de.employeeId;
+                });
+                if (!existingEmp) {
+                    employees.push(de);
+                    modified = true;
+                } else {
+                    var needsUpdate = false;
+                    if (existingEmp.employeeName !== de.employeeName) {
+                        existingEmp.employeeName = de.employeeName;
+                        needsUpdate = true;
+                    }
+                    if (!existingEmp.promotionDate || existingEmp.promotionDate !== de.promotionDate) {
+                        existingEmp.promotionDate = de.promotionDate;
+                        needsUpdate = true;
+                    }
+                    if (!existingEmp.history || existingEmp.history.length < de.history.length) {
+                        existingEmp.history = de.history;
+                        needsUpdate = true;
+                    }
+                    if (!existingEmp.dateOfJoining || existingEmp.dateOfJoining !== de.dateOfJoining) {
+                        existingEmp.dateOfJoining = de.dateOfJoining;
+                        needsUpdate = true;
+                    }
+                    if (!existingEmp.dateOfBirth || existingEmp.dateOfBirth !== de.dateOfBirth) {
+                        existingEmp.dateOfBirth = de.dateOfBirth;
+                        needsUpdate = true;
+                    }
+                    if (needsUpdate) {
+                        modified = true;
+                    }
+                }
+            });
+            if (modified) {
+                try {
+                    localStorage.setItem("hal_employees", JSON.stringify(employees));
+                } catch (e) {}
+            }
+        }
+
+        var isEditMode = false;
+        var editTargetId = "";
+
+        // 2. Authentication Logic
+        function handleLogin() {
+            var user = document.getElementById("username").value.trim();
+            var pass = document.getElementById("password").value;
+            var errorDiv = document.getElementById("loginError");
+
+            var authenticated = false;
+            var role = "ADMIN";
+            var displayName = "HR Administrator";
+
+            if (user === "admin" && (pass === "admin123" || pass === "admin")) {
+                authenticated = true;
+                role = "ADMIN";
+                displayName = "HR Administrator (Demo)";
+            } else if (user === "operator" && (pass === "hal123" || pass === "operator")) {
+                authenticated = true;
+                role = "OPERATOR";
+                displayName = "HR Clerk (Demo)";
+            }
+
+            if (authenticated) {
+                errorDiv.style.display = "none";
+                document.getElementById("userRoleBadge").innerText = role;
+                document.getElementById("userNameLabel").innerText = displayName;
+                
+                // Hide edit/add controls for Operator role
+                var addButtons = document.querySelectorAll("#nav-add, .actions-bar button");
+                for (var i = 0; i < addButtons.length; i++) {
+                    if (addButtons[i].id === "nav-add" || addButtons[i].innerText.indexOf("Add") > -1) {
+                        addButtons[i].style.display = (role === "ADMIN") ? "" : "none";
+                    }
+                }
+
+                document.getElementById("loginScreen").classList.remove("active");
+                document.getElementById("appLayout").classList.add("active");
+                switchScreen("dashboardScreen");
+            } else {
+                errorDiv.style.display = "block";
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById("appLayout").classList.remove("active");
+            document.getElementById("loginScreen").classList.add("active");
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+        }
+
+        // 3. Navigation Screens Routing
+        function switchScreen(screenId) {
+            var screens = document.querySelectorAll(".screen");
+            screens.forEach(function(s) {
+                if (s.id !== "loginScreen" && s.id !== "appLayout") {
+                    s.classList.remove("active");
+                }
+            });
+            document.getElementById(screenId).classList.add("active");
+
+            // Reset navbar highlights
+            var navItems = document.querySelectorAll(".sidebar-item");
+            navItems.forEach(function(item) {
+                item.classList.remove("active");
+            });
+
+            if (screenId === "dashboardScreen") {
+                document.getElementById("nav-dashboard").classList.add("active");
+                document.getElementById("pageTitle").innerText = "HR Administration Dashboard";
+                updateDashboardStats();
+                
+                // Trigger jet glide animation reset
+                var jet = document.querySelector(".jet-glide");
+                if (jet) {
+                    jet.style.animation = 'none';
+                    jet.offsetHeight; /* trigger reflow */
+                    jet.style.animation = null;
+                }
+            } else if (screenId === "rosterScreen") {
+                document.getElementById("nav-roster").classList.add("active");
+                document.getElementById("pageTitle").innerText = "Active Employees Directory";
+                renderRosterTable();
+            } else if (screenId === "seniorityScreen") {
+                document.getElementById("nav-seniority").classList.add("active");
+                document.getElementById("pageTitle").innerText = "Seniority Ranks Calculator";
+                renderSeniorityTable();
+            }
+        }
+
+        function updateDashboardStats() {
+            document.getElementById("statTotalEmployees").innerText = employees.length;
+        }
+
+        // 4. Populate active roster grid
+        function renderRosterTable() {
+            var table = document.getElementById("rosterTable");
+            if (!table) return;
+
+            var activeInfo = getActiveGradesJS(employees, null);
+            var activeGrades = activeInfo.active;
+            var activeGradesCount = activeInfo.count;
+
+            var headerHtml = 
+                "<thead>" +
+                "  <tr>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Employee ID</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Full Name</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Grade</th>";
+            if (activeGradesCount > 0) {
+                headerHtml += "    <th colspan='" + activeGradesCount + "' style='text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);'>Promotion Dates per Grade (Position)</th>";
+            }
+            headerHtml +=
+                "    <th rowspan='2' style='vertical-align: middle;'>Date of Joining</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Date of Birth</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Retirement Date</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Department</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Designation</th>" +
+                "    <th rowspan='2' class='no-print' style='width: 120px; text-align: center; vertical-align: middle;'>Actions</th>" +
+                "  </tr>" +
+                "  <tr>";
+            for (var g = 10; g >= 1; g--) {
+                if (activeGrades[g]) {
+                    var dName = getDesignationForGradeJS("Grade " + g);
+                    var shortD = dName.indexOf("(") > -1 ? dName.substring(dName.indexOf("(")+1, dName.indexOf(")")) : dName;
+                    headerHtml += "    <th style='font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 90px;'>Gr " + g + "<br><span style='font-size:0.7rem; font-weight:normal; opacity:0.85;'>" + shortD + "</span></th>";
+                }
+            }
+            headerHtml += "  </tr>" +
+                          "</thead>";
+
+            var existingThead = table.querySelector("thead");
+            if (existingThead) table.removeChild(existingThead);
+            table.insertAdjacentHTML('afterbegin', headerHtml);
+
+            var tbody = document.getElementById("rosterTableBody");
+            tbody.innerHTML = "";
+
+            if (employees.length === 0) {
+                var totalCols = 9 + activeGradesCount;
+                tbody.innerHTML = "<tr><td colspan='" + totalCols + "' style='text-align: center; color: var(--text-light); padding: 2rem;'>No employee records found.</td></tr>";
+                return;
+            }
+
+            employees.forEach(function(emp) {
+                var tr = document.createElement("tr");
+                
+                var gradeCols = "";
+                for (var g = 10; g >= 1; g--) {
+                    if (activeGrades[g]) {
+                        var pDate = getPromotionDateForGrade(emp, "Grade " + g);
+                        gradeCols += "<td style='text-align: center; font-size: 0.85rem;'>" + (pDate ? formatDate(pDate) : "-") + "</td>";
+                    }
+                }
+                
+                var dobDate = new Date(emp.dateOfBirth);
+                var retDateStr = "N/A";
+                if (!isNaN(dobDate.getTime())) {
+                    var retYear = dobDate.getFullYear() + 60;
+                    var retMonth = dobDate.getMonth();
+                    var lastDay = new Date(retYear, retMonth + 1, 0).getDate();
+                    var mStr = (retMonth + 1) < 10 ? "0" + (retMonth + 1) : (retMonth + 1);
+                    var dStr = lastDay < 10 ? "0" + lastDay : lastDay;
+                    retDateStr = formatDate(retYear + "-" + mStr + "-" + dStr);
+                }
+
+                tr.innerHTML = 
+                    "<td><strong>" + emp.employeeId + "</strong></td>" +
+                    "<td>" + emp.employeeName + "</td>" +
+                    "<td>" + emp.grade + "</td>" +
+                    gradeCols +
+                    "<td>" + formatDate(emp.dateOfJoining) + "</td>" +
+                    "<td>" + formatDate(emp.dateOfBirth) + "</td>" +
+                    "<td>" + retDateStr + "</td>" +
+                    "<td>" + emp.department + "</td>" +
+                    "<td>" + (emp.designation ? expandDesignation(emp.designation) : "") + "</td>" +
+                    "<td class='no-print' style='text-align: center;'>" +
+                        "<a onclick=\"showEditForm('" + emp.employeeId + "')\" style='color: var(--hal-blue); font-weight: bold; cursor: pointer; margin-right: 10px;'>Edit</a>" +
+                        "<a onclick=\"deleteEmployee('" + emp.employeeId + "')\" style='color: var(--danger-red); font-weight: bold; cursor: pointer;'>Delete</a>" +
+                    "</td>";
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterRosterTable() {
+            var query = document.getElementById("rosterSearchInput").value.toLowerCase();
+            var rows = document.querySelectorAll("#rosterTableBody tr");
+
+            rows.forEach(function(row) {
+                var text = row.innerText.toLowerCase();
+                if (text.indexOf(query) > -1) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        // 5. Seniority Calculation Logic (JavaScript equivalent of the Oracle CTE query)
+        function calculateSeniority() {
+            // Clone the list to avoid modifying the master data
+            var list = JSON.parse(JSON.stringify(employees));
+
+            list.sort(function(a, b) {
+                // Rule 1: Grade Level Weight (Senior Grade first)
+                var weightA = parseInt(a.grade.substring(6));
+                var weightB = parseInt(b.grade.substring(6));
+                if (weightB !== weightA) {
+                    return weightB - weightA; 
+                }
+
+                // Rule 2-4: Compare promotion dates backwards grade-by-grade
+                // Find all grade promotion dates from history
+                for (var g = 10; g >= 1; g--) {
+                    var gradeKey = "Grade " + g;
+                    var dateA = getPromotionDateForGrade(a, gradeKey);
+                    var dateB = getPromotionDateForGrade(b, gradeKey);
+
+                    if (dateA || dateB) {
+                        if (!dateA) return 1;  // nulls last
+                        if (!dateB) return -1; // nulls last
+                        if (dateA !== dateB) {
+                            return new Date(dateA) - new Date(dateB); // Earlier is senior
+                        }
+                    }
+                }
+
+                // Rule 5: Date of Joining (DOJ)
+                if (a.dateOfJoining !== b.dateOfJoining) {
+                    return new Date(a.dateOfJoining) - new Date(b.dateOfJoining);
+                }
+
+                // Rule 6: Date of Birth (DOB) - Older employee is senior
+                if (a.dateOfBirth !== b.dateOfBirth) {
+                    return new Date(a.dateOfBirth) - new Date(b.dateOfBirth);
+                }
+
+                // Rule 7: Tie-breaker (Employee ID ascending)
+                return a.employeeId.localeCompare(b.employeeId);
+            });
+
+            return list;
+        }
+
+        function getPromotionDateForGrade(emp, gradeName) {
+            // First check if current grade matches
+            if (emp.grade === gradeName) {
+                return emp.promotionDate;
+            }
+            // Check history
+            if (emp.history) {
+                for (var i = 0; i < emp.history.length; i++) {
+                    if (emp.history[i].grade === gradeName) {
+                        return emp.history[i].promoDate;
+                    }
+                }
+            }
+            return null;
+        }
+
+        function getDesignationForGradeJS(gradeName) {
+            if (!gradeName) return "";
+            if (gradeName === "Grade 1") return "Trainee / Assistant Engineer";
+            if (gradeName === "Grade 2") return "Engineer / Officer";
+            if (gradeName === "Grade 3") return "Assistant Manager";
+            if (gradeName === "Grade 4") return "Deputy Manager";
+            if (gradeName === "Grade 5") return "Manager";
+            if (gradeName === "Grade 6") return "Senior Manager";
+            if (gradeName === "Grade 7") return "Chief Manager";
+            if (gradeName === "Grade 8") return "Deputy General Manager";
+            if (gradeName === "Grade 9") return "Additional General Manager";
+            if (gradeName === "Grade 10") return "General Manager";
+            return "";
+        }
+
+        function getActiveGradesJS(empList, selectedGrade) {
+            var activeGrades = {};
+            var activeGradesCount = 0;
+            
+            empList.forEach(function(emp) {
+                for (var g = 1; g <= 10; g++) {
+                    var gradeKey = "Grade " + g;
+                    var pDate = getPromotionDateForGrade(emp, gradeKey);
+                    if (pDate) {
+                        if (!activeGrades[g]) {
+                            activeGrades[g] = true;
+                            activeGradesCount++;
+                        }
+                    }
+                }
+            });
+            
+            if (activeGradesCount === 0) {
+                if (selectedGrade && selectedGrade.indexOf("Grade ") > -1) {
+                    var gStr = selectedGrade.substring(selectedGrade.indexOf("Grade ") + 6).trim();
+                    var spaceIdx = gStr.indexOf(" ");
+                    if (spaceIdx > -1) gStr = gStr.substring(0, spaceIdx);
+                    var g = parseInt(gStr);
+                    if (!isNaN(g)) {
+                        activeGrades[g] = true;
+                        activeGradesCount = 1;
+                    }
+                } else if (empList.length > 0) {
+                    var gName = empList[0].grade;
+                    if (gName && gName.startsWith("Grade ")) {
+                        var g = parseInt(gName.substring(6).trim());
+                        if (!isNaN(g)) {
+                            activeGrades[g] = true;
+                            activeGradesCount = 1;
+                        }
+                    }
+                }
+            }
+            
+            return {
+                active: activeGrades,
+                count: activeGradesCount
+            };
+        }
+
+        // 6. Renders Seniority Engine lists
+        function renderSeniorityTable() {
+            var selectedGrade = document.getElementById("seniorityGradeFilter").value;
+            var title = document.getElementById("seniorityTableTitle");
+            
+            title.innerText = selectedGrade === "ALL" 
+                ? "Organization-Wide Seniority Listings" 
+                : selectedGrade + " Seniority Rankings";
+
+            var rankedList = calculateSeniority();
+
+            // Filter by grade if selected
+            if (selectedGrade !== "ALL") {
+                rankedList = rankedList.filter(function(emp) {
+                    return emp.grade === selectedGrade;
+                });
+            }
+
+            var table = document.getElementById("seniorityTable");
+            if (!table) return;
+
+            var activeInfo = getActiveGradesJS(rankedList, selectedGrade);
+            var activeGrades = activeInfo.active;
+            var activeGradesCount = activeInfo.count;
+
+            // Rebuild the THEAD
+            var headerHtml = 
+                "<thead>" +
+                "  <tr>" +
+                "    <th rowspan='2' style='width: 80px; text-align: center; vertical-align: middle;'>Rank</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Employee ID</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Employee Name</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Grade</th>";
+            if (activeGradesCount > 0) {
+                headerHtml += "    <th colspan='" + activeGradesCount + "' style='text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);'>Promotion Dates per Grade (Position)</th>";
+            }
+            headerHtml +=
+                "    <th rowspan='2' style='vertical-align: middle;'>Date of Joining</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Date of Birth</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Retirement Date</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Department</th>" +
+                "    <th rowspan='2' style='vertical-align: middle;'>Designation</th>" +
+                "  </tr>" +
+                "  <tr>";
+            for (var g = 10; g >= 1; g--) {
+                if (activeGrades[g]) {
+                    var dName = getDesignationForGradeJS("Grade " + g);
+                    var shortD = dName.indexOf("(") > -1 ? dName.substring(dName.indexOf("(")+1, dName.indexOf(")")) : dName;
+                    headerHtml += "    <th style='font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 90px;'>Gr " + g + "<br><span style='font-size:0.7rem; font-weight:normal; opacity:0.85;'>" + shortD + "</span></th>";
+                }
+            }
+            headerHtml += "  </tr>" +
+                          "</thead>";
+
+            var existingThead = table.querySelector("thead");
+            if (existingThead) table.removeChild(existingThead);
+            table.insertAdjacentHTML('afterbegin', headerHtml);
+
+            var tbody = document.getElementById("seniorityTableBody");
+            tbody.innerHTML = "";
+
+            if (rankedList.length === 0) {
+                var totalCols = 9 + activeGradesCount;
+                tbody.innerHTML = "<tr><td colspan='" + totalCols + "' style='text-align: center; color: var(--text-light); padding: 2rem;'>No employee records found in this grade category.</td></tr>";
+                return;
+            }
+
+            rankedList.forEach(function(emp, index) {
+                var tr = document.createElement("tr");
+                
+                var gradeCols = "";
+                for (var g = 10; g >= 1; g--) {
+                    if (activeGrades[g]) {
+                        var pDate = getPromotionDateForGrade(emp, "Grade " + g);
+                        gradeCols += "<td style='text-align: center; font-size: 0.85rem;'>" + (pDate ? formatDate(pDate) : "-") + "</td>";
+                    }
+                }
+                
+                var dobDate = new Date(emp.dateOfBirth);
+                var retDateStr = "N/A";
+                if (!isNaN(dobDate.getTime())) {
+                    var retYear = dobDate.getFullYear() + 60;
+                    var retMonth = dobDate.getMonth();
+                    var lastDay = new Date(retYear, retMonth + 1, 0).getDate();
+                    var mStr = (retMonth + 1) < 10 ? "0" + (retMonth + 1) : (retMonth + 1);
+                    var dStr = lastDay < 10 ? "0" + lastDay : lastDay;
+                    retDateStr = formatDate(retYear + "-" + mStr + "-" + dStr);
+                }
+
+                tr.innerHTML = 
+                    "<td style='text-align: center;'><strong>" + (index + 1) + "</strong></td>" +
+                    "<td><strong>" + emp.employeeId + "</strong></td>" +
+                    "<td>" + emp.employeeName + "</td>" +
+                    "<td>" + emp.grade + "</td>" +
+                    gradeCols +
+                    "<td>" + formatDate(emp.dateOfJoining) + "</td>" +
+                    "<td>" + formatDate(emp.dateOfBirth) + "</td>" +
+                    "<td>" + retDateStr + "</td>" +
+                    "<td>" + emp.department + "</td>" +
+                    "<td>" + (emp.designation ? expandDesignation(emp.designation) : "") + "</td>";
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 7. Form Operations (CRUD Logic)
+        function showAddForm() {
+            isEditMode = false;
+            document.getElementById("formTitle").innerText = "Register New Employee Profile";
+            document.getElementById("formEmployeeId").value = "";
+            document.getElementById("formEmployeeId").readOnly = false;
+            document.getElementById("formEmployeeId").style.backgroundColor = "#ffffff";
+            document.getElementById("formEmployeeName").value = "";
+            document.getElementById("formDepartment").value = "";
+            document.getElementById("formDesignation").value = "";
+            document.getElementById("formGrade").value = "Grade 4";
+            document.getElementById("formLevel").value = "Level 1";
+            document.getElementById("formDOB").value = "";
+            document.getElementById("formDOJ").value = "";
+            document.getElementById("formPromotionDate").value = "";
+
+            switchScreen("formScreen");
+            document.getElementById("nav-add").classList.add("active");
+        }
+
+        function showEditForm(empId) {
+            isEditMode = true;
+            editTargetId = empId;
+            document.getElementById("formTitle").innerText = "Modify Employee File";
+
+            // Find employee
+            var emp = employees.find(function(e) { return e.employeeId === empId; });
+            if (!emp) return;
+
+            document.getElementById("formEmployeeId").value = emp.employeeId;
+            document.getElementById("formEmployeeId").readOnly = true;
+            document.getElementById("formEmployeeId").style.backgroundColor = "#e2e8f0";
+            document.getElementById("formEmployeeName").value = emp.employeeName;
+            document.getElementById("formDepartment").value = emp.department;
+            document.getElementById("formDesignation").value = emp.designation;
+            document.getElementById("formGrade").value = emp.grade;
+            document.getElementById("formLevel").value = emp.empLevel;
+            document.getElementById("formDOB").value = emp.dateOfBirth;
+            document.getElementById("formDOJ").value = emp.dateOfJoining;
+            document.getElementById("formPromotionDate").value = emp.promotionDate;
+
+            switchScreen("formScreen");
+        }
+
+        function saveEmployee() {
+            var empId = document.getElementById("formEmployeeId").value.trim();
+            var empName = document.getElementById("formEmployeeName").value.trim();
+            var dept = document.getElementById("formDepartment").value.trim();
+            var desig = expandDesignation(document.getElementById("formDesignation").value.trim());
+            var grade = document.getElementById("formGrade").value;
+            var level = document.getElementById("formLevel").value;
+            var dob = document.getElementById("formDOB").value;
+            var doj = document.getElementById("formDOJ").value;
+            var promo = document.getElementById("formPromotionDate").value;
+
+            if (empId === "" || empName === "" || dob === "" || doj === "" || promo === "") {
+                alert("Please fill in all required fields!");
+                return;
+            }
+
+            var dobDate = new Date(dob);
+            var dojDate = new Date(doj);
+            var promoDate = new Date(promo);
+
+            if (dojDate <= dobDate) {
+                alert("Joining date must be after Date of Birth!");
+                return;
+            }
+
+            if (promoDate < dojDate) {
+                alert("Promotion date cannot be earlier than Date of Joining!");
+                return;
+            }
+
+            if (isEditMode) {
+                // Update active list
+                var idx = employees.findIndex(function(e) { return e.employeeId === editTargetId; });
+                if (idx > -1) {
+                    employees[idx].employeeName = empName;
+                    employees[idx].department = dept;
+                    employees[idx].designation = desig;
+                    
+                    // If grade changed, push old promotion date into history
+                    if (employees[idx].grade !== grade) {
+                        if (!employees[idx].history) employees[idx].history = [];
+                        // check if already has history for current grade
+                        var hIdx = employees[idx].history.findIndex(function(h) { return h.grade === employees[idx].grade; });
+                        if (hIdx > -1) {
+                            employees[idx].history[hIdx].promoDate = employees[idx].promotionDate;
+                        } else {
+                            employees[idx].history.push({ grade: employees[idx].grade, promoDate: employees[idx].promotionDate });
+                        }
+                    }
+
+                    employees[idx].grade = grade;
+                    employees[idx].empLevel = level;
+                    employees[idx].dateOfBirth = dob;
+                    employees[idx].dateOfJoining = doj;
+                    employees[idx].promotionDate = promo;
+                }
+            } else {
+                // Add new
+                // Check duplicate
+                var duplicate = employees.find(function(e) { return e.employeeId === empId; });
+                if (duplicate) {
+                    alert("An employee with ID " + empId + " already exists!");
+                    return;
+                }
+
+                var newEmp = {
+                    employeeId: empId,
+                    employeeName: empName,
+                    grade: grade,
+                    empLevel: level,
+                    promotionDate: promo,
+                    dateOfJoining: doj,
+                    dateOfBirth: dob,
+                    department: dept,
+                    designation: desig,
+                    history: [
+                        { grade: grade, promoDate: promo }
+                    ]
+                };
+                employees.push(newEmp);
+            }
+
+            try {
+                localStorage.setItem("hal_employees", JSON.stringify(employees));
+            } catch (e) {}
+            alert("Record saved successfully!");
+            switchScreen("rosterScreen");
+        }
+
+        function deleteEmployee(empId) {
+            if (!confirm("Are you sure you want to delete employee file: " + empId + "?")) {
+                return;
+            }
+            employees = employees.filter(function(e) { return e.employeeId !== empId; });
+            try {
+                localStorage.setItem("hal_employees", JSON.stringify(employees));
+            } catch (e) {}
+            renderRosterTable();
+            updateDashboardStats();
+        }
+
+        // Helper function to expand designation abbreviations (CM, DM, GM, AGM, DGM, SM) to full forms
+        function expandDesignation(desig) {
+            if (!desig) return "";
+            return desig
+                .replace(/\bAGM\b/g, "Additional General Manager")
+                .replace(/\bDGM\b/g, "Deputy General Manager")
+                .replace(/\bGM\b/g, "General Manager")
+                .replace(/\bCM\b/g, "Chief Manager")
+                .replace(/\bDM\b/g, "Deputy Manager")
+                .replace(/\bSM\b/g, "Senior Manager");
+        }
+
+        // Helper date formatter
+        function formatDate(dateString) {
+            if (!dateString) return "";
+            var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            var parts = dateString.split("-");
+            if (parts.length !== 3) return dateString;
+            var year = parts[0];
+            var month = months[parseInt(parts[1]) - 1];
+            var day = parts[2];
+            return day + "-" + month + "-" + year;
+        }
+
+        // CSV Table Exporter script
+        function exportCSV(tableId, filename) {
+            var csv = [];
+            var table = document.getElementById(tableId);
+            if (!table) return;
+
+            var rows = table.querySelectorAll("tr");
+            for (var i = 0; i < rows.length; i++) {
+                var row = [];
+                var cols = rows[i].querySelectorAll("td, th");
+                
+                // Hide actions column from csv download
+                var limit = cols.length;
+                if (tableId === "rosterTable") {
+                    limit = cols.length - 1;
+                }
+
+                for (var j = 0; j < limit; j++) {
+                    var cellText = cols[j].innerText.trim();
+                    cellText = cellText.replace(/"/g, '""');
+                    row.push('"' + cellText + '"');
+                }
+                csv.push(row.join(","));
+            }
+
+            var csvFile = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+            var downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        // Attach Submit Event Listener
+        document.getElementById("loginForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            handleLogin();
+        });
+    </script>
+</body>
+</html>

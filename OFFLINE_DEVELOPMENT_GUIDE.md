@@ -1,0 +1,222 @@
+# HAL HR Seniority System - Offline Customization & Deployment Guide
+
+This guide describes how to run, manage, and extend the HAL HR Seniority Management System when working **100% offline** on HAL systems.
+
+---
+
+## 1. Quick Start (Running the App Offline)
+
+### Option A: The Mockup Version (Zero Setup)
+If the HAL system does not have Oracle Database or Java installed, you can run the entire system directly from the browser:
+1. Open the file **index.html** in any modern web browser (Google Chrome, Microsoft Edge, Firefox).
+2. Log in using:
+   - **Username**: `admin`
+   - **Password**: `admin123`
+3. All operations (Adding, Editing, Deleting, Ranking) will work instantly. Data is saved in the browser's local cache (`localStorage`).
+
+### Option B: The Full Java & Database Version
+If running the database-connected system:
+1. Double-click **start_hal_system.bat**.
+2. This script will automatically:
+   - Detect the local Java installation.
+   - Compile all Java source files.
+   - Deploy the application files into the bundled Apache Tomcat server.
+   - Start the Tomcat server.
+   - Launch your browser at `http://localhost:8080/HAL/`.
+
+---
+
+## 2. Adding New Officer Profiles
+
+### Method A: Through the Web Interface (easiest, no code editing)
+1. Open the application (either the local portal or web portal) and log in as `admin`.
+2. Navigate to the **Active Employees Directory** (Roster).
+3. Click the **Register New Employee Profile** button.
+4. Fill in the profile fields:
+   - Employee ID (e.g. `120025`)
+   - Full Name
+   - Department (e.g., `LCA Division`, `Overhaul Division`)
+   - Designation (e.g., `General Manager`, `Senior Technician`)
+   - Grade (e.g. `Grade 4`, `Grade 10`)
+   - Dates (DOB, DOJ, current Grade Promotion Date).
+5. Click **Save**. The profile is added immediately.
+
+### Method B: Adding to the Database via SQL (schema.sql)
+Open `schema.sql` in Notepad or any text editor:
+1. Scroll down to the end of the `MST_EMPLOYEES` insertions.
+2. Insert a new line using this format:
+   ```sql
+   INSERT INTO MST_EMPLOYEES (employee_id, employee_name, grade, emp_level, promotion_date, date_of_joining, date_of_birth, department, designation, company_id)
+   VALUES ('120500', 'New Officer Name', 'Grade 4', 'Level 1', TO_DATE('2023-07-01', 'YYYY-MM-DD'), TO_DATE('2015-05-15', 'YYYY-MM-DD'), TO_DATE('1990-08-12', 'YYYY-MM-DD'), 'Overhaul Engine', 'Highly Skilled Technician', 17);
+   ```
+3. Insert corresponding grade promotion history into `TRN_PROMOTIONS`. For example:
+   ```sql
+   INSERT INTO TRN_PROMOTIONS (promotion_id, employee_id, grade, promotion_date, order_number, company_id, pos_code, valid_from, valid_to, is_primary, assignment_type)
+   VALUES (SEQ_PROMOTIONS.NEXTVAL, '120500', 'Grade 1', TO_DATE('2015-07-01', 'YYYY-MM-DD'), 'ORD-2015-GR1', 17, 'Trainee (Overhaul Engine)', TO_DATE('2015-07-01', 'YYYY-MM-DD'), TO_DATE('2018-06-30', 'YYYY-MM-DD'), 0, 'TRAINEE');
+   
+   INSERT INTO TRN_PROMOTIONS (promotion_id, employee_id, grade, promotion_date, order_number, company_id, pos_code, valid_from, valid_to, is_primary, assignment_type)
+   VALUES (SEQ_PROMOTIONS.NEXTVAL, '120500', 'Grade 4', TO_DATE('2023-07-01', 'YYYY-MM-DD'), 'ORD-2023-GR4', 17, 'Highly Skilled Technician', TO_DATE('2023-07-01', 'YYYY-MM-DD'), TO_DATE('2045-12-31', 'YYYY-MM-DD'), 1, 'CPS');
+   ```
+4. Execute `schema.sql` in your Oracle SQL command line or SQL Developer client.
+
+---
+
+## 3. How to Add Custom Columns (e.g. SC/ST Category & Cadre: Officer vs. Workman)
+
+If you are asked on-site to add columns for **Category (SC/ST/OBC/GEN)** or **Cadre (Officer / Workman)**, follow these step-by-step instructions.
+
+### METHOD A: Updating the Offline Mockup (index.html)
+
+#### Step 1: Add Fields to the Form UI (HTML)
+Open `index.html` in Notepad. Find the Add/Edit form (around line 680, look for `<div class="form-group">` containing `formDepartment`). Right below it, paste this code:
+```html
+<div class="form-group">
+    <label>Caste Category (SC / ST / OBC / GEN)</label>
+    <select id="formCategory" class="form-control">
+        <option value="GEN">General (GEN)</option>
+        <option value="SC">Scheduled Caste (SC)</option>
+        <option value="ST">Scheduled Tribe (ST)</option>
+        <option value="OBC">Other Backward Class (OBC)</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Cadre Type (Officer / Workman)</label>
+    <select id="formCadre" class="form-control">
+        <option value="Officer">Officer</option>
+        <option value="Workman">Workman</option>
+    </select>
+</div>
+```
+
+#### Step 2: Update the Form Save and Load Scripts (JavaScript)
+* Find the function `showAddForm` (around line 1441) and add:
+  ```javascript
+  document.getElementById("formCategory").value = "GEN";
+  document.getElementById("formCadre").value = "Officer";
+  ```
+* Find the function `showEditForm` (around line 1460) and add:
+  ```javascript
+  document.getElementById("formCategory").value = emp.category || "GEN";
+  document.getElementById("formCadre").value = emp.cadre || "Officer";
+  ```
+* Find the function `saveEmployee` (around line 1484).
+  * Near the top, read the input values:
+    ```javascript
+    var category = document.getElementById("formCategory").value;
+    var cadre = document.getElementById("formCadre").value;
+    ```
+  * In the edit section (around line 1518, under `if (isEditMode)`), update the properties:
+    ```javascript
+    employees[idx].category = category;
+    employees[idx].cadre = cadre;
+    ```
+  * In the add section (around line 1549, inside `newEmp` object), store the properties:
+    ```javascript
+    category: category,
+    cadre: cadre,
+    ```
+
+#### Step 3: Add Table Headers
+Search for `<thead>` in both `renderRosterTable` (around line 1111) and `renderSeniorityTable` (around line 1337).
+* Locate `<th rowspan='2' style='vertical-align: middle;'>Retirement Date</th>`.
+* Right next to it, paste:
+  ```javascript
+  "    <th rowspan='2' style='vertical-align: middle;'>Category (SC/ST)</th>" +
+  "    <th rowspan='2' style='vertical-align: middle;'>Cadre</th>" +
+  ```
+
+#### Step 4: Display Values in Table Rows
+* In `renderRosterTable` (around line 1182), look for `"<td>" + retDateStr + "</td>" +`.
+* Right next to it, paste:
+  ```javascript
+  "<td>" + (emp.category || "GEN") + "</td>" +
+  "<td>" + (emp.cadre || "Officer") + "</td>" +
+  ```
+* Do the exact same thing in `renderSeniorityTable` (around line 1425), pasting it right after the retirement date column cell.
+
+---
+
+### METHOD B: Modifying the Full Java & Oracle Database Version
+
+#### Step 1: Alter the Oracle Database Columns
+Run this SQL script in the Oracle client to add the columns to the database table:
+```sql
+ALTER TABLE MST_EMPLOYEES ADD category VARCHAR2(10) DEFAULT 'GEN' NOT NULL;
+ALTER TABLE MST_EMPLOYEES ADD cadre VARCHAR2(15) DEFAULT 'Officer' NOT NULL;
+```
+
+#### Step 2: Modify the Java Model Class (Employee.java)
+Open `src/com/hal/hrms/model/Employee.java` and add:
+* Add fields:
+  ```java
+  private String category;
+  private String cadre;
+  ```
+* Add getters & setters:
+  ```java
+  public String getCategory() { return category; }
+  public void setCategory(String category) { this.category = category; }
+  public String getCadre() { return cadre; }
+  public void setCadre(String cadre) { this.cadre = cadre; }
+  ```
+
+#### Step 3: Update Data Access Layer (EmployeeDAO.java)
+Open `src/com/hal/hrms/dao/EmployeeDAO.java`:
+* In `initMemoryStore()` (around line 39), modify the SELECT SQL to fetch `category` and `cadre` from database:
+  ```java
+  String sql = "SELECT employee_id, employee_name, grade, emp_level, promotion_date, " +
+               "date_of_joining, date_of_birth, department, designation, category, cadre FROM MST_EMPLOYEES";
+  ```
+* Inside the `while(rs.next())` loop (around line 45), read these values and set them on the employee object:
+  ```java
+  emp.setCategory(rs.getString("category") != null ? rs.getString("category").trim() : "GEN");
+  emp.setCadre(rs.getString("cadre") != null ? rs.getString("cadre").trim() : "Officer");
+  ```
+* Update the SQL `INSERT` statements in `addEmployee` and the SQL `UPDATE` statements in `editEmployee` to include category and cadre values.
+
+#### Step 4: Update JSP Files (View UI)
+* In `employee-list.jsp` and `seniority.jsp`:
+  * Add `<th>Category (SC/ST)</th>` and `<th>Cadre</th>` inside the table header tags (`<thead>`).
+  * Add `<td><%= emp.getCategory() %></td>` and `<td><%= emp.getCadre() %></td>` inside the table row generation loop (`<tbody>`).
+* In `employee-form.jsp`:
+  * Add Category and Cadre input fields matching the HTML structure in Method A.
+  * In the servlet handler (`EmployeeServlet.java`), parse the category and cadre fields from the HTTP request and set them on the employee object before saving.
+
+#### Step 5: Recompile and Redeploy
+Once code files are saved:
+1. Double-click `start_hal_system.bat`.
+2. The compiler will run, outputting success, and restart the Tomcat server with your new columns online.
+
+---
+
+## 4. Connecting to Production Oracle Database (Configuring db.properties)
+
+To link the Java web application to their actual production database on-site, edit the file **`src/db.properties`** (or edit the deployed version in `tomcat/webapps/HAL/WEB-INF/classes/db.properties`).
+
+### 1. Database Connection String
+Modify the first section of `db.properties` with their actual server IP, port, service name/SID, and account details:
+```properties
+db.driver=oracle.jdbc.driver.OracleDriver
+db.url=jdbc:oracle:thin:@10.x.x.x:1521:PROD_SID
+db.username=production_username
+db.password=production_password
+```
+
+### 2. Copy the JDBC Driver (Critical)
+Tomcat needs the Oracle JDBC driver to talk to the database. 
+1. Obtain the database driver file (e.g. **`ojdbc14.jar`**, **`ojdbc6.jar`**, or **`ojdbc8.jar`**) from their database administrator.
+2. Copy this file into the **`tomcat/lib/`** directory of your application folder before starting Tomcat.
+
+### 3. Mapping Real Table & Column Names
+If their database uses different table names or column names, edit the mapping in `db.properties`.
+For example, if their active employee list is in a table called `EMPLOYEE_MASTER` and the employee name column is named `EMP_FULL_NAME`:
+1. Change: `table.employees=MST_EMPLOYEES` to `table.employees=EMPLOYEE_MASTER`
+2. Change: `col.emp.name=employee_name` to `col.emp.name=EMP_FULL_NAME`
+3. Save the file. The changes are read dynamically instantly when users load lists (no Java compilation needed!).
+
+---
+
+## 5. Troubleshooting Offline Failures
+* **"JDK Compiler Javac Not Found"**: This means Java JDK is not installed on the system, or the script failed to find it. Double check that the Java version installed on the HAL system is at least Java Runtime Environment (JRE) or Java Development Kit (JDK).
+* **Clear Browser Cache**: If you edited code inside `index.html` but do not see it in the browser, press `F12` to open developer tools, right-click the reload button in the browser, and select **"Empty Cache and Hard Reload"**, or open the console and type `localStorage.clear()` followed by hitting Enter to refresh the mocked data database.

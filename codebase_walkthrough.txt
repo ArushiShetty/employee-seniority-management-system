@@ -1,0 +1,178 @@
+========================================================================
+HAL HR SENIORITY SYSTEM - CODEBASE WALKTHROUGH
+========================================================================
+
+This document provides a walkthrough of the codebase, detailing the purpose
+of every file and how the seniority sorting algorithm is implemented.
+
+------------------------------------------------------------------------
+1. PROJECT ARCHITECTURE
+------------------------------------------------------------------------
+
+The application is structured into two main parts:
+1. Dynamic Java Web Application: Served by Apache Tomcat 9, utilizing 
+   Servlets (Controllers), Java DAOs (Data Access), models (POJOs), 
+   and JSPs (Views).
+2. Offline Standalone Application (index.html): A self-contained, 
+   offline-compatible HTML/JS/CSS application using localStorage to 
+   seed data and mirror the exact layout/functionality of the dynamic app.
+
+------------------------------------------------------------------------
+2. DIRECTORY & FILE SUMMARIES
+------------------------------------------------------------------------
+
+ROOT WORKSPACE FILES:
+* index.html: 
+  The offline portal. Seeds 106 demo employees (including seniority tie-breakers
+  and recovery logic for browser local cache), expands designation acronyms 
+  to full forms (e.g., General Manager, Chief Manager), and simulates all HR 
+  actions (list, add, edit, seniority sorting, promotion timeline) offline.
+* schema.sql: 
+  Database schema definitions containing table structures for EMPLOYEES, 
+  PROMOTION_HISTORY, and USERS.
+* start_hal_system.bat: 
+  Windows batch script that automatically detects Java environments, compiles 
+  Java classes, deploys files, and launches the Tomcat server.
+
+BACKEND SOURCE CODE (src/com/hal/hrms/):
+
+* model/Employee.java: 
+  Represents an employee entity with metadata (ID, name, Date of Birth, 
+  Date of Joining, current grade, current designation, current promotion date) 
+  and their complete promotion history list.
+* model/Promotion.java: 
+  Represents an individual historic promotion entry (grade, promotion date, 
+  designation).
+* model/User.java: 
+  Represents the authenticated HR Operator user (username, name, role like 
+  ADMIN or USER).
+* dao/EmployeeDAO.java: 
+  Manages database transactions for employee records. In the absence of an 
+  active Oracle Database driver, it initializes and returns in-memory mock 
+  data (with dynamic dates and corrected details for M. Visvesvaraya).
+* dao/UserDAO.java: 
+  Validates HR Operator login details and maps database credentials to 
+  User objects.
+* servlet/DashboardServlet.java: 
+  Prepares high-level metrics (total employees, authorized operators, etc.) 
+  and routes to the dashboard.
+* servlet/EmployeeServlet.java: 
+  Coordinates listing, registration, modification of employees, and CSV list 
+  imports/exports.
+* servlet/LoginServlet.java: 
+  Handles the secure operator authentication checks.
+* servlet/LogoutServlet.java: 
+  Invalidates sessions and handles logouts.
+* servlet/SeniorityServlet.java: 
+  Directs the seniority calculations and fetches sorted data.
+* util/DBConnection.java: 
+  Setup tool for JDBC connectivity.
+* util/SeniorityComparator.java: 
+  The core sorting engine implemented as a Java Comparator to evaluate 
+  employee seniority.
+* util/TestSeniority.java: 
+  Command-line unit testing file to verify comparator rules.
+
+DYNAMIC JSP VIEWS (WebContent/):
+* WebContent/login.jsp: 
+  Responsive login interface featuring official branding.
+* WebContent/dashboard.jsp: 
+  Hub containing metrics and quick operations.
+* WebContent/employee-list.jsp: 
+  HR employee registry table with searches and CSV tools.
+* WebContent/employee-form.jsp: 
+  Add/Edit form for employee properties.
+* WebContent/seniority.jsp: 
+  Generates the official seniority ranking layout.
+
+------------------------------------------------------------------------
+3. SENIORITY SORTING RULES
+------------------------------------------------------------------------
+
+Both the Java system (via SeniorityComparator.java) and the offline version 
+(via Javascript function calculateSeniority()) implement the exact same 
+7-stage hierarchical sorting rules to calculate official seniority:
+
+Rule 1: Current Grade Level Weight (Higher Grade is Senior)
+- Evaluated by extracting the weight number from the Grade string 
+  (e.g., "Grade 10" = 10, "Grade 9" = 9).
+- Higher weights are placed first (Senior-most first).
+
+Rule 2-4: Backward Grade-by-Grade Promotion Dates (Earlier Date is Senior)
+- If two employees share the same current grade (e.g. both are Grade 8), 
+  the system steps backwards grade-by-grade (from Grade 10 down to Grade 1) 
+  comparing their promotion dates.
+- For a shared grade (e.g. Grade 8), the employee with the earlier promotion 
+  date is senior.
+- If their promotion dates for Grade 8 are identical, it compares their Grade 7 
+  promotion dates, then Grade 6, and so on.
+- Employees who lack promotion dates (null) for a grade are sorted after 
+  those who have dates.
+
+Rule 5: Date of Joining (DOJ) (Earlier Date is Senior)
+- If all promotion history dates are a tie, the employee with the earlier 
+  Date of Joining is senior.
+
+Rule 6: Date of Birth (DOB) (Older Employee is Senior)
+- If the DOJ is also a tie, the older employee (earlier Date of Birth) is senior.
+
+Rule 7: Tie-breaker (Employee ID Ascending)
+- In the rare event of a complete tie across all of the above, the employee 
+  with the smaller numerical/lexicographical Employee ID is placed first.
+
+------------------------------------------------------------------------
+4. INTERACTIVE ANIMATIONS
+------------------------------------------------------------------------
+
+To provide a premium and responsive user experience representing Hindustan
+Aeronautics Limited (HAL), subtle aero-themed micro-animations have been added:
+
+1. Dashboard Jet Glide Animation:
+   - When the dashboard screen loads, a stylized jet watermark silhouette glides
+     smoothly across the header title area.
+   - For index.html, this is automatically reset and re-triggered whenever
+     the screen is switched back to the dashboard via JavaScript.
+2. Sidebar Floating Jet Watermark:
+   - A slow, continuous floating keyframe animation is applied to the jet SVG 
+     watermark inside the navigation sidebar.
+3. Statistics Card Lift Hover:
+   - Stat cards transition with translateY(-4px) and gain a drop-shadow 
+     and border-color change on mouse hover.
+
+------------------------------------------------------------------------
+5. OFFLINE EMERGENCY TROUBLESHOOTING GUIDE
+------------------------------------------------------------------------
+
+If you are running the system on a machine without internet access and encounter issues, use the following quick-fixes:
+
+### SCENARIO A: The batch script (start_hal_system.bat) won't run/compile
+1. Java SDK Not Found:
+   - Ensure Java JDK 8 or later is installed.
+   - Open start_hal_system.bat in a text editor and hardcode the path. Change:
+     set "JAVA_HOME=!DETECTED_JAVA_HOME!"
+     to:
+     set "JAVA_HOME=C:\Program Files\Java\jdk1.8.0_xxx" (replace with the actual path)
+2. Tomcat Server Already Running / Port Conflict (Port 8080):
+   - If another application uses port 8080, Tomcat will fail.
+   - Open tomcat\conf\server.xml.
+   - Search for: <Connector port="8080" protocol="HTTP/1.1"
+   - Change 8080 to a free port, e.g. 8085 or 9090.
+   - Run start_hal_system.bat again and access http://localhost:8085/HAL/
+
+### SCENARIO B: The dynamic web application throws server errors (500) or database connection errors
+- The application automatically falls back to an in-memory mock database if the Oracle database drivers or connection details are missing.
+- If it still fails, use the offline mockup version:
+  * Simply double-click "index.html" in the root directory.
+  * It runs 100% in any browser without needing Java, databases, or local servers.
+  * It has the exact same visual layout, 106 pre-seeded records, seniority engine, and timeline features.
+
+### SCENARIO C: The offline dashboard (index.html) has missing records or behaves weirdly
+- This is caused by outdated data stored in the browser's localStorage cache.
+- How to reset:
+  1. Open index.html in the browser.
+  2. Press F12 to open the Developer Options.
+  3. Go to the "Console" tab.
+  4. Type: localStorage.clear();
+  5. Press Enter.
+  6. Reload the page (F5). It will clean out the cache and re-seed all 106 correct records.
+

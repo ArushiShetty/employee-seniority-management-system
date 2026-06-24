@@ -1,0 +1,142 @@
+========================================================================
+ORACLE DATABASE - STEP-BY-STEP OFFLINE SETUP GUIDE FOR HAL SYSTEMS
+========================================================================
+
+Follow this simple, step-by-step guide when you are at the HAL office. 
+It will help you connect the seniority system to their local Oracle 
+Database, even if you have no internet access.
+
+------------------------------------------------------------------------
+STEP 1: FIND OUT THE DATABASE LOGIN DETAILS
+------------------------------------------------------------------------
+
+To connect the application, you need 5 pieces of information. 
+Ask the HAL Database Administrator (DBA), or check their PL/SQL 
+Developer login screen:
+
+1. Host (IP Address): The address of the database computer 
+   (e.g., localhost or 10.20.30.40).
+2. Port: The database connection port (usually 1521 for Oracle).
+3. SID / Service Name: The database name (usually XE or ORCL or HALDB).
+4. Username: The login name they use (e.g., system, hr_user).
+5. Password: The password for the username.
+
+Note: If they connect in PL/SQL Developer using a TNS name like 
+"Database: HALDB", ask the administrator: 
+"What is the Host IP, Port, and SID for HALDB?"
+
+------------------------------------------------------------------------
+STEP 2: FIND THEIR TABLE NAMES AND COLUMN NAMES
+------------------------------------------------------------------------
+
+The database might have different table or column names than the ones 
+we used. To find their exact table names and column names using 
+PL/SQL Developer:
+
+1. Log in to PL/SQL Developer.
+2. Look at the left sidebar under the Tables folder to find where 
+   employee files are stored (e.g., MST_EMPLOYEES, EMPLOYEES, or 
+   EMP_MASTER).
+3. Open a new SQL window and run this SQL query to see all columns:
+
+   SELECT table_name, column_name, data_type 
+   FROM user_tab_columns 
+   WHERE table_name IN ('MST_EMPLOYEES', 'TRN_PROMOTIONS')
+   ORDER BY table_name, column_id;
+
+   (If their table names are different, replace 'MST_EMPLOYEES' and 
+   'TRN_PROMOTIONS' in the query with their real table names).
+   
+4. Write down the exact column names they use for:
+   - Employee ID
+   - Full Name
+   - Grade (e.g. Grade 1 to 10)
+   - Date of Joining (DOJ)
+   - Date of Birth (DOB)
+   - Promotion Date
+
+------------------------------------------------------------------------
+STEP 3: FIND THE ORACLE DRIVER FILE (ojdbc.jar)
+------------------------------------------------------------------------
+
+Java needs a helper file called a JDBC Driver to talk to Oracle. 
+This file is already on their computers! To find it:
+
+1. Open Windows File Explorer on the HAL computer.
+2. Click on "This PC" (or "My Computer").
+3. In the search box in the top-right corner, type:
+   ojdbc*.jar
+   and press Enter.
+4. Windows will search and show files like "ojdbc14.jar", 
+   "ojdbc6.jar", or "ojdbc8.jar".
+5. Copy the file (right-click -> Copy).
+6. Navigate to your project folder:
+   c:\HAL Internship\tomcat\lib\
+   and paste the file there.
+
+------------------------------------------------------------------------
+STEP 4: UPDATE THE CONFIGURATION FILE
+------------------------------------------------------------------------
+
+Open your project folder, go to "src\", and open the "db.properties" 
+file in Notepad:
+
+1. Enter Connection Details:
+   - Change db.url to match the Host IP, Port, and SID:
+     db.url=jdbc:oracle:thin:@IP_ADDRESS:PORT:SID
+     (Example: db.url=jdbc:oracle:thin:@10.20.30.40:1521:HALDB)
+   - Change db.username and db.password to match their database login.
+2. Enter Table Names:
+   - Change table.employees and table.promotions to match their actual 
+     table names.
+3. Enter Column Mappings:
+   - Change column mappings (e.g. col.emp.id, col.emp.name) to match 
+     their column names exactly.
+4. Save and Close the file in Notepad.
+
+------------------------------------------------------------------------
+STEP 5: COMPILE & RUN THE APP
+------------------------------------------------------------------------
+
+Depending on the operating system of the HAL computer, run the startup script:
+
+* For Windows:
+  1. Double-click the file "start_hal_system.bat" in your project folder.
+  2. The script will compile your changes, start Tomcat, and automatically 
+     open the portal in your browser.
+
+* For Linux / Ubuntu:
+  1. Open the terminal.
+  2. Navigate to your project folder:
+     cd "/path/to/HAL Internship"
+  3. Run the startup script:
+     chmod +x start_hal_system.sh
+     ./start_hal_system.sh
+  4. The script will compile, start Tomcat, and attempt to open the portal 
+     in your web browser automatically.
+
+------------------------------------------------------------------------
+STEP 6: HOW TO OPEN THE SITE IN THE BROWSER (IF NOT OPENED AUTOMATICALLY)
+------------------------------------------------------------------------
+
+If the web browser does not pop up automatically after starting the script, 
+do the following:
+
+* If using the Database Version (Tomcat):
+  1. Open your web browser (Google Chrome, Firefox, or Chromium).
+  2. Type this address in the top address bar and press Enter:
+     http://localhost:8080/HAL/
+
+* If using the Mockup Version (index.html):
+  1. Open your web browser (Google Chrome, Firefox, or Chromium).
+  2. Press "Ctrl + O" on your keyboard (the universal shortcut to open 
+     any offline file in any browser).
+  3. A file explorer window will open. Navigate to the project folder 
+     "HAL Internship" and select "index.html" to open it.
+
+------------------------------------------------------------------------
+* Note on Config Edits: If you make configuration edits directly on the 
+  running server, you can edit the file at:
+  tomcat/webapps/HAL/WEB-INF/classes/db.properties
+  and restart the server (using shutdown and startup scripts in tomcat/bin) 
+  to see changes instantly without rebuilding.
