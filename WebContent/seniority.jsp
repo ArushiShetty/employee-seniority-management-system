@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Date" %>
 <%@ page import="com.hal.hrms.model.Employee" %>
 <%@ page import="com.hal.hrms.model.User" %>
 <%
@@ -13,7 +14,6 @@
     if (selectedGrade == null) {
         selectedGrade = "ALL";
     }
-    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MMM-yyyy");
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -139,7 +139,7 @@
 
         .page-container {
             padding: 2rem;
-            max-width: 1200px;
+            max-width: 1400px;
             width: 100%;
             margin: 0 auto;
         }
@@ -167,28 +167,32 @@
         .table-responsive {
             overflow-x: auto;
             width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
         }
 
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
         }
 
         .data-table th {
             background-color: var(--hal-navy);
             color: #ffffff;
             text-align: left;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 0.8rem;
             font-weight: bold;
-            border: 1px solid var(--hal-navy);
+            border: 1px solid rgba(255,255,255,0.15);
+            white-space: nowrap;
         }
 
         .data-table td {
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 0.8rem;
             border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
             color: var(--text-dark);
+            white-space: nowrap;
         }
 
         .data-table tbody tr:nth-child(even) {
@@ -197,6 +201,25 @@
 
         .data-table tbody tr:hover {
             background-color: #ebf8ff;
+        }
+
+        /* Dropdown and search filters in headers */
+        .header-filter-select, .header-filter-input {
+            width: 100%;
+            margin-top: 4px;
+            padding: 3px 5px;
+            font-size: 0.75rem;
+            color: var(--text-dark);
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            font-weight: normal;
+        }
+        .header-filter-select:focus, .header-filter-input:focus {
+            border-color: var(--hal-blue);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 2px rgba(0, 75, 135, 0.15);
         }
 
         /* Forms Dropdown */
@@ -262,9 +285,45 @@
             flex-wrap: wrap;
         }
 
+        /* Pagination Styling */
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .page-btn {
+            padding: 0.4rem 0.8rem;
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-dark);
+            transition: all 0.2s;
+        }
+        .page-btn:hover:not(:disabled) {
+            background-color: var(--hal-blue);
+            color: #ffffff;
+            border-color: var(--hal-blue);
+        }
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* CSS Print Template for PDF Generation */
         @media print {
-            .sidebar, .top-bar, .actions-bar, .btn, .no-print {
+            .sidebar, .top-bar, .actions-bar, .btn, .no-print, .filter-row {
                 display: none !important;
             }
             .main-content {
@@ -291,12 +350,6 @@
             }
         }
     </style>
-    <script type="text/javascript">
-        function handleGradeChange() {
-            var grade = document.getElementById("gradeFilter").value;
-            window.location.href = "seniority?gradeFilter=" + encodeURIComponent(grade);
-        }
-    </script>
 </head>
 <body>
 
@@ -311,9 +364,18 @@
                 <path d="M50 5 L53 25 L85 55 L85 62 L54 50 L53 85 L65 92 L65 95 L50 90 L35 95 L35 92 L47 85 L46 50 L15 62 L15 55 L47 25 Z" />
             </svg>
 
-            <div class="sidebar-brand" style="display: flex; align-items: center; justify-content: center; padding: 0.5rem; background: #ffffff; border-radius: 6px; margin: 0 0.5rem 1.5rem 0.5rem; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-                <img src="images/hal-logo.png" alt="HAL Logo" style="max-width: 100%; height: auto; max-height: 38px;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 1.5rem; padding-left: 0.5rem;">
+                <svg viewBox="0 0 100 100" style="width: 40px; height: 40px;">
+                    <circle cx="50" cy="50" r="40" fill="#007bc4" opacity="0.25" stroke="#007bc4" stroke-width="2"/>
+                    <path d="M15,80 Q50,45 80,25" fill="none" stroke="#FF9933" stroke-width="3.5" stroke-linecap="round"/>
+                    <path d="M80,25 L76,32 L69,27 Z" fill="#FF9933"/>
+                </svg>
+                <div style="display: flex; flex-direction: column; text-align: left; line-height: 1.1;">
+                    <span style="font-size: 0.8rem; font-weight: bold; color: #ffffff; letter-spacing: 1px;">हिएलि</span>
+                    <span style="font-size: 1.1rem; font-weight: 900; color: #007bc4; letter-spacing: 2px; font-style: italic;">HAL</span>
+                </div>
             </div>
+            
             <ul class="sidebar-menu">
                 <li class="sidebar-item"><a href="dashboard">Dashboard</a></li>
                 <li class="sidebar-item active"><a href="seniority">Seniority Engine</a></li>
@@ -328,7 +390,7 @@
         <!-- Main Content Area -->
         <div class="main-content">
             <div class="top-bar">
-                <div class="top-bar-title">Seniority Calculations Engine - Overhaul Division</div>
+                <div class="top-bar-title">Seniority Calculations Engine</div>
                 <div class="user-profile">
                     <span class="user-badge"><%= currentUser.getUserRole() %></span>
                     <span>Welcome, <strong><%= currentUser.getEmployeeName() %></strong></span>
@@ -344,23 +406,26 @@
                     </div>
                     <div class="no-print" style="display: flex; gap: 0.5rem;">
                         <button onclick="window.print()" class="btn btn-secondary">Print Report / PDF</button>
-                        <!-- Server-Side Export (Fully Java 1.4 Native) -->
-                        <a href="seniority?gradeFilter=<%= selectedGrade %>&export=csv" class="btn btn-primary">Download CSV</a>
+                        <a href="seniority?export=csv" class="btn btn-primary">Download CSV</a>
                     </div>
                 </div>
 
-                <!-- Grade Selection Filter -->
+                <!-- Grade Selection Filter (Synced to dynamic filter row) -->
                 <div class="card no-print">
                     <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                         <label for="gradeFilter" class="form-label" style="margin-bottom: 0; white-space: nowrap;">Filter Seniority List by Grade:</label>
-                        <select id="gradeFilter" name="gradeFilter" class="form-control" style="max-width: 250px;" onchange="handleGradeChange()">
-                            <option value="ALL" <%= "ALL".equals(selectedGrade) ? "selected" : "" %>>All Grades (Global Ranks)</option>
-                            <% for (int g = 1; g <= 10; g++) { 
-                                String currentG = "Grade " + g;
-                                boolean selected = currentG.equals(selectedGrade);
-                            %>
-                                <option value="<%= currentG %>" <%= selected ? "selected" : "" %>><%= currentG %> (<%= Employee.getDesignationForGrade(currentG) %>)</option>
-                            <% } %>
+                        <select id="gradeFilter" class="form-control" style="max-width: 320px;" onchange="syncTopGradeFilter()">
+                            <option value="">All Grades (Global Ranks)</option>
+                            <option value="Grade 1">Grade I (Assistant Engineer)</option>
+                            <option value="Grade 2">Grade II (Engineer)</option>
+                            <option value="Grade 3">Grade III (Deputy Manager)</option>
+                            <option value="Grade 4">Grade IV (Manager)</option>
+                            <option value="Grade 5">Grade V (Senior Manager)</option>
+                            <option value="Grade 6">Grade VI (Chief Manager)</option>
+                            <option value="Grade 7">Grade VII (Deputy General Manager)</option>
+                            <option value="Grade 8">Grade VIII (Additional General Manager)</option>
+                            <option value="Grade 9">Grade IX (General Manager)</option>
+                            <option value="Grade 10">Grade X (Executive Director)</option>
                         </select>
                         <span style="font-size: 0.85rem; color: var(--text-light);">
                             Selecting a single grade shows the internal seniority ranks of employees in that grade.
@@ -370,127 +435,401 @@
 
                 <!-- Seniority Table -->
                 <div class="card">
-                    <h3 class="card-title">
-                        <%= "ALL".equals(selectedGrade) ? "Organization-Wide Seniority Listings" : selectedGrade + " Seniority Rankings" %>
+                    <h3 class="card-title" id="seniorityTableTitle">
+                        Organization-Wide Seniority Listings
                     </h3>
 
                     <div class="table-responsive">
-                        <%
-                            boolean[] activeGrades = new boolean[11]; // index 1 to 10
-                            int activeGradesCount = 0;
-                            if (seniorityList != null && !seniorityList.isEmpty()) {
-                                for (int i = 0; i < seniorityList.size(); i++) {
-                                    Employee emp = (Employee) seniorityList.get(i);
-                                    for (int g = 1; g <= 10; g++) {
-                                        if (emp.getPromotionDateForGrade("Grade " + g) != null) {
-                                            if (!activeGrades[g]) {
-                                                activeGrades[g] = true;
-                                                activeGradesCount++;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            if (activeGradesCount == 0) {
-                                if (selectedGrade != null && selectedGrade.startsWith("Grade ")) {
-                                    try {
-                                        int g = Integer.parseInt(selectedGrade.substring(6).trim());
-                                        activeGrades[g] = true;
-                                        activeGradesCount = 1;
-                                    } catch (Exception e) {}
-                                } else if (seniorityList != null && !seniorityList.isEmpty()) {
-                                    Employee emp = (Employee) seniorityList.get(0);
-                                    String gName = emp.getGrade();
-                                    if (gName != null && gName.startsWith("Grade ")) {
-                                        try {
-                                            int g = Integer.parseInt(gName.substring(6).trim());
-                                            activeGrades[g] = true;
-                                            activeGradesCount = 1;
-                                        } catch (Exception e) {}
-                                    }
-                                }
-                            }
-                            
-                            int totalColsCount = 4 + activeGradesCount + 5;
-                        %>
                         <table class="data-table" id="seniorityTable">
                             <thead>
                                 <tr>
-                                    <th rowspan="2" style="width: 80px; text-align: center; vertical-align: middle;">Rank</th>
-                                    <th rowspan="2" style="vertical-align: middle;">Employee ID</th>
-                                    <th rowspan="2" style="vertical-align: middle;">Employee Name</th>
-                                    <th rowspan="2" style="vertical-align: middle;">Grade</th>
-                                    <% if (activeGradesCount > 0) { %>
-                                        <th colspan="<%= activeGradesCount %>" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Promotion Dates per Grade (Position)</th>
-                                    <% } %>
+                                    <th rowspan="2" style="width: 60px; text-align: center; vertical-align: middle;">Sl No.</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Div/Office</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Complex</th>
+                                    <th rowspan="2" style="vertical-align: middle;">PB No</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Name (S/Shri)</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Discipline</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Present Designation</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Present Grade</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Gender</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Ex DT/MT</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Ex Servicemen</th>
+                                    <th rowspan="2" style="vertical-align: middle;">PHP</th>
+                                    <th rowspan="2" style="vertical-align: middle;">SC/ST/OBC/Gen</th>
+                                    <th rowspan="2" style="vertical-align: middle;">DOB</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Super Annuation</th>
                                     <th rowspan="2" style="vertical-align: middle;">Date of Joining</th>
-                                    <th rowspan="2" style="vertical-align: middle;">Date of Birth</th>
-                                    <th rowspan="2" style="vertical-align: middle;">Retirement Date</th>
-                                    <th rowspan="2" style="vertical-align: middle;">Department</th>
-                                    <th rowspan="2" style="vertical-align: middle;">Designation</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Date of Absorption</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Date of seniority in present grade</th>
+                                    <th colspan="10" style="text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2);">Seniority in Grades</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Educational Qualification</th>
+                                    <th rowspan="2" style="vertical-align: middle;">Remarks</th>
                                 </tr>
                                 <tr>
-                                    <% for (int g = 10; g >= 1; g--) { 
-                                        if (activeGrades[g]) {
-                                            String dName = Employee.getDesignationForGrade("Grade " + g);
-                                            String shortD = dName.indexOf("(") > -1 ? dName.substring(dName.indexOf("(")+1, dName.indexOf(")")) : dName;
-                                    %>
-                                        <th style="font-size: 0.8rem; padding: 0.5rem; text-align: center; min-width: 90px;">
-                                            Gr <%= g %><br><span style="font-size:0.7rem; font-weight:normal; opacity:0.85;"><%= shortD %></span>
-                                        </th>
-                                    <% 
-                                        }
-                                    } %>
+                                    <th style="text-align: center; min-width: 85px;">I</th>
+                                    <th style="text-align: center; min-width: 85px;">II</th>
+                                    <th style="text-align: center; min-width: 85px;">III</th>
+                                    <th style="text-align: center; min-width: 85px;">IV</th>
+                                    <th style="text-align: center; min-width: 85px;">V</th>
+                                    <th style="text-align: center; min-width: 85px;">VI</th>
+                                    <th style="text-align: center; min-width: 85px;">VII</th>
+                                    <th style="text-align: center; min-width: 85px;">VIII</th>
+                                    <th style="text-align: center; min-width: 85px;">IX</th>
+                                    <th style="text-align: center; min-width: 85px;">X</th>
+                                </tr>
+                                <!-- Clean filter dropdowns row -->
+                                <tr class="filter-row no-print">
+                                    <th></th>
+                                    <th><select id="filter-division" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><select id="filter-complex" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><input type="text" id="filter-employeeId" class="header-filter-input" placeholder="Search ID..." onkeyup="applyFilters()"></th>
+                                    <th><input type="text" id="filter-employeeName" class="header-filter-input" placeholder="Search name..." onkeyup="applyFilters()"></th>
+                                    <th><select id="filter-discipline" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><select id="filter-designation" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><select id="filter-grade" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><select id="filter-gender" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><select id="filter-exDtMt" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><select id="filter-exServicemen" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><select id="filter-php" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><select id="filter-category" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><input type="text" id="filter-dob" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                    <th><input type="text" id="filter-retDate" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                    <th><input type="text" id="filter-doj" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                    <th><input type="text" id="filter-doa" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                    <th><input type="text" id="filter-promoDate" class="header-filter-input" placeholder="Year..." onkeyup="applyFilters()"></th>
+                                    <th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th>
+                                    <th><select id="filter-qualification" class="header-filter-select" onchange="applyFilters()"><option value="">All</option></select></th>
+                                    <th><input type="text" id="filter-remarks" class="header-filter-input" placeholder="Search..." onkeyup="applyFilters()"></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <%
-                                    if (seniorityList != null && !seniorityList.isEmpty()) {
-                                        for (int i = 0; i < seniorityList.size(); i++) {
-                                            Employee emp = (Employee) seniorityList.get(i);
-                                %>
-                                    <tr>
-                                        <td style="text-align: center;"><strong><%= emp.getRank() %></strong></td>
-                                        <td><strong><%= emp.getEmployeeId() %></strong></td>
-                                        <td><%= emp.getEmployeeName() %></td>
-                                        <td><%= emp.getGrade() %></td>
-                                        
-                                        <% for (int g = 10; g >= 1; g--) { 
-                                            if (activeGrades[g]) {
-                                                java.util.Date pDate = emp.getPromotionDateForGrade("Grade " + g);
-                                        %>
-                                            <td style="text-align: center; font-size: 0.85rem;">
-                                                <%= pDate != null ? sdf.format(pDate) : "-" %>
-                                            </td>
-                                        <% 
-                                            }
-                                        } %>
-                                        
-                                        <td><%= sdf.format(emp.getDateOfJoining()) %></td>
-                                        <td><%= sdf.format(emp.getDateOfBirth()) %></td>
-                                        <td><%= emp.getDateOfRetirement() != null ? sdf.format(emp.getDateOfRetirement()) : "N/A" %></td>
-                                        <td><%= emp.getDepartment() %></td>
-                                        <td><%= emp.getDesignation() %></td>
-                                    </tr>
-                                <%
-                                        }
-                                    } else {
-                                %>
-                                    <tr>
-                                        <td colspan="<%= totalColsCount %>" style="text-align: center; color: var(--text-light); padding: 2rem;">
-                                            No employee records found in this grade category.
-                                        </td>
-                                    </tr>
-                                <%
-                                    }
-                                %>
+                            <tbody id="seniorityTableBody">
+                                <!-- Populated dynamically by client JS -->
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Pagination and display count summary -->
+                    <div class="pagination-container no-print">
+                        <div id="displayCountLabel">Showing 0 to 0 of 0 records</div>
+                        <div class="pagination-controls">
+                            <label for="pageSizeSelect" style="margin-right: 0.5rem;">Page Size:</label>
+                            <select id="pageSizeSelect" onchange="changePageSize()" style="padding: 0.3rem; border-radius: 4px; border: 1px solid var(--border-color); margin-right: 1rem;">
+                                <option value="50">50</option>
+                                <option value="100" selected>100</option>
+                                <option value="200">200</option>
+                                <option value="ALL">All</option>
+                            </select>
+                            <button id="prevPageBtn" class="page-btn" onclick="prevPage()">&larr; Prev</button>
+                            <span id="currentPageLabel">Page 1 of 1</span>
+                            <button id="nextPageBtn" class="page-btn" onclick="nextPage()">Next &rarr;</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- JSON DATA EMBEDDING FROM JAVA BACKEND -->
+    <script type="text/javascript">
+        var allEmployees = [
+            <%
+                java.text.SimpleDateFormat outSdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                java.text.SimpleDateFormat displaySdf = new java.text.SimpleDateFormat("dd-MMM-yyyy");
+                if (seniorityList != null) {
+                    for (int i = 0; i < seniorityList.size(); i++) {
+                        Employee emp = (Employee) seniorityList.get(i);
+                        String dobStr = emp.getDateOfBirth() != null ? outSdf.format(emp.getDateOfBirth()) : "";
+                        String dojStr = emp.getDateOfJoining() != null ? outSdf.format(emp.getDateOfJoining()) : "";
+                        String doaStr = emp.getDateOfAbsorption() != null ? outSdf.format(emp.getDateOfAbsorption()) : "";
+                        String promoStr = emp.getPromotionDate() != null ? outSdf.format(emp.getPromotionDate()) : "";
+                        String retStr = emp.getDateOfRetirement() != null ? displaySdf.format(emp.getDateOfRetirement()) : "N/A";
+                        
+                        String empNameEsc = emp.getEmployeeName() != null ? emp.getEmployeeName().replace("'", "\\'").replace("\"", "\\\"") : "";
+                        String deptEsc = emp.getDepartment() != null ? emp.getDepartment().replace("'", "\\'").replace("\"", "\\\"") : "";
+                        String desigEsc = emp.getDesignation() != null ? emp.getDesignation().replace("'", "\\'").replace("\"", "\\\"") : "";
+                        String divEsc = emp.getDivision() != null ? emp.getDivision().replace("'", "\\'").replace("\"", "\\\"") : "";
+                        String compEsc = emp.getComplex() != null ? emp.getComplex().replace("'", "\\'").replace("\"", "\\\"") : "";
+                        String discEsc = emp.getDiscipline() != null ? emp.getDiscipline().replace("'", "\\'").replace("\"", "\\\"") : "";
+                        String qualEsc = emp.getEducationalQualification() != null ? emp.getEducationalQualification().replace("'", "\\'").replace("\"", "\\\"") : "";
+                        String remEsc = emp.getRemarks() != null ? emp.getRemarks().replace("'", "\\'").replace("\"", "\\\"") : "";
+            %>
+                {
+                    employeeId: '<%= emp.getEmployeeId() %>',
+                    employeeName: '<%= empNameEsc %>',
+                    grade: '<%= emp.getGrade() %>',
+                    empLevel: '<%= emp.getEmpLevel() %>',
+                    doj: '<%= dojStr %>',
+                    dob: '<%= dobStr %>',
+                    doa: '<%= doaStr %>',
+                    division: '<%= divEsc %>',
+                    complex: '<%= compEsc %>',
+                    discipline: '<%= discEsc %>',
+                    gender: '<%= emp.getGender() %>',
+                    exDtMt: '<%= emp.getExDtMt() %>',
+                    exServicemen: '<%= emp.getExServicemen() %>',
+                    php: '<%= emp.getPhp() %>',
+                    category: '<%= emp.getCategory() %>',
+                    qualification: '<%= qualEsc %>',
+                    remarks: '<%= remEsc %>',
+                    designation: '<%= desigEsc %>',
+                    retDate: '<%= retStr %>',
+                    promoDate: '<%= promoStr %>',
+                    history: {
+                        <% for (int g = 1; g <= 10; g++) { 
+                            Date pd = emp.getPromotionDateForGrade("Grade " + g);
+                            String pdStr = pd != null ? outSdf.format(pd) : "";
+                        %>
+                            'Grade <%= g %>': '<%= pdStr %>'<%= (g < 10) ? "," : "" %>
+                        <% } %>
+                    }
+                }<%= (i < seniorityList.size() - 1) ? "," : "" %>
+            <%
+                    }
+                }
+            %>
+        ];
+
+        // PAGINATION & FILTERING CONFIGURATION
+        var currentPage = 1;
+        var pageSize = 100;
+        var filteredEmployees = [];
+
+        // Dynamic Formatter helper
+        function formatDate(dateString) {
+            if (!dateString || dateString === "-") return "";
+            var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            var parts = dateString.split("-");
+            if (parts.length !== 3) return dateString;
+            var year = parts[0];
+            var month = months[parseInt(parts[1]) - 1];
+            var day = parts[2];
+            return day + "-" + month + "-" + year;
+        }
+
+        // Initialize lists and choices on page load
+        window.onload = function() {
+            populateFilterOptions();
+            applyFilters();
+        };
+
+        // Populate header dropdowns dynamically from existing unique options
+        function populateFilterOptions() {
+            var categoricalCols = {
+                'division': 'filter-division',
+                'complex': 'filter-complex',
+                'discipline': 'filter-discipline',
+                'grade': 'filter-grade',
+                'gender': 'filter-gender',
+                'exDtMt': 'filter-exDtMt',
+                'exServicemen': 'filter-exServicemen',
+                'php': 'filter-php',
+                'category': 'filter-category',
+                'qualification': 'filter-qualification',
+                'designation': 'filter-designation'
+            };
+            
+            for (var key in categoricalCols) {
+                var selectId = categoricalCols[key];
+                var selectEl = document.getElementById(selectId);
+                if (!selectEl) continue;
+                
+                var uniqueVals = {};
+                allEmployees.forEach(function(emp) {
+                    var val = emp[key];
+                    if (val && val.trim() !== '') {
+                        uniqueVals[val] = true;
+                    }
+                });
+                
+                var sortedVals = Object.keys(uniqueVals).sort();
+                
+                selectEl.innerHTML = '<option value="">All</option>';
+                sortedVals.forEach(function(val) {
+                    var opt = document.createElement('option');
+                    opt.value = val;
+                    opt.innerText = val;
+                    selectEl.appendChild(opt);
+                });
+            }
+        }
+
+        // Top Filter synchronization
+        function syncTopGradeFilter() {
+            var val = document.getElementById('gradeFilter').value;
+            document.getElementById('filter-grade').value = val;
+            applyFilters();
+        }
+
+        // Filter calculation engine
+        function applyFilters() {
+            var textFilters = {
+                'employeeId': document.getElementById('filter-employeeId').value.toLowerCase(),
+                'employeeName': document.getElementById('filter-employeeName').value.toLowerCase(),
+                'dob': document.getElementById('filter-dob').value.toLowerCase(),
+                'retDate': document.getElementById('filter-retDate').value.toLowerCase(),
+                'doj': document.getElementById('filter-doj').value.toLowerCase(),
+                'doa': document.getElementById('filter-doa').value.toLowerCase(),
+                'promoDate': document.getElementById('filter-promoDate').value.toLowerCase(),
+                'remarks': document.getElementById('filter-remarks').value.toLowerCase()
+            };
+            
+            var selectFilters = {
+                'division': document.getElementById('filter-division').value,
+                'complex': document.getElementById('filter-complex').value,
+                'discipline': document.getElementById('filter-discipline').value,
+                'grade': document.getElementById('filter-grade').value,
+                'gender': document.getElementById('filter-gender').value,
+                'exDtMt': document.getElementById('filter-exDtMt').value,
+                'exServicemen': document.getElementById('filter-exServicemen').value,
+                'php': document.getElementById('filter-php').value,
+                'category': document.getElementById('filter-category').value,
+                'qualification': document.getElementById('filter-qualification').value,
+                'designation': document.getElementById('filter-designation').value
+            };
+
+            filteredEmployees = allEmployees.filter(function(emp) {
+                // Apply text filters
+                for (var key in textFilters) {
+                    var q = textFilters[key];
+                    if (q !== '') {
+                        var val = emp[key] ? emp[key].toLowerCase() : '';
+                        // Also check formatted dates for text search inputs
+                        if (key === 'dob' || key === 'doj' || key === 'doa' || key === 'promoDate') {
+                            val = formatDate(emp[key]).toLowerCase();
+                        }
+                        if (val.indexOf(q) === -1) return false;
+                    }
+                }
+                
+                // Apply select filters
+                for (var key in selectFilters) {
+                    var q = selectFilters[key];
+                    if (q !== '') {
+                        var val = emp[key] ? emp[key] : '';
+                        if (val !== q) return false;
+                    }
+                }
+                return true;
+            });
+            
+            // Sync top select dropdown in case filter-grade was modified manually
+            var gradeVal = document.getElementById('filter-grade').value;
+            var topSelect = document.getElementById('gradeFilter');
+            if (topSelect) {
+                topSelect.value = gradeVal;
+            }
+            
+            // Update title
+            var titleEl = document.getElementById('seniorityTableTitle');
+            if (titleEl) {
+                titleEl.innerText = gradeVal === "" 
+                    ? "Organization-Wide Seniority Listings" 
+                    : gradeVal + " Seniority Rankings";
+            }
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Render current paginated view
+        function renderTable() {
+            var tbody = document.getElementById('seniorityTableBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            var totalRecords = filteredEmployees.length;
+            var startIdx = (currentPage - 1) * pageSize;
+            var endIdx = startIdx + pageSize;
+            if (endIdx > totalRecords) endIdx = totalRecords;
+            
+            document.getElementById('displayCountLabel').innerText = 'Showing ' + (totalRecords > 0 ? (startIdx + 1) : 0) + ' to ' + endIdx + ' of ' + totalRecords + ' records';
+            
+            if (totalRecords === 0) {
+                tbody.innerHTML = '<tr><td colspan="30" style="text-align: center; color: var(--text-light); padding: 2rem;">No employee records match the filters.</td></tr>';
+                updatePaginationControls(0);
+                return;
+            }
+            
+            var pageList = filteredEmployees.slice(startIdx, endIdx);
+            
+            pageList.forEach(function(emp, index) {
+                var tr = document.createElement('tr');
+                
+                // Build the promotion history columns (I to X)
+                var gradeCols = '';
+                for (var g = 1; g <= 10; g++) {
+                    var pd = emp.history['Grade ' + g];
+                    gradeCols += '<td style="text-align: center; font-size: 0.85rem;">' + (pd ? formatDate(pd) : '-') + '</td>';
+                }
+                
+                tr.innerHTML = 
+                    '<td style="text-align: center;"><strong>' + (startIdx + index + 1) + '</strong></td>' +
+                    '<td>' + emp.division + '</td>' +
+                    '<td>' + emp.complex + '</td>' +
+                    '<td><strong>' + emp.employeeId + '</strong></td>' +
+                    '<td>S/Shri ' + emp.employeeName + '</td>' +
+                    '<td>' + emp.discipline + '</td>' +
+                    '<td>' + emp.designation + '</td>' +
+                    '<td>' + emp.grade + '</td>' +
+                    '<td>' + emp.gender + '</td>' +
+                    '<td>' + emp.exDtMt + '</td>' +
+                    '<td>' + emp.exServicemen + '</td>' +
+                    '<td>' + emp.php + '</td>' +
+                    '<td>' + emp.category + '</td>' +
+                    '<td>' + formatDate(emp.dob) + '</td>' +
+                    '<td>' + emp.retDate + '</td>' +
+                    '<td>' + formatDate(emp.doj) + '</td>' +
+                    '<td>' + (emp.doa ? formatDate(emp.doa) : '-') + '</td>' +
+                    '<td>' + (emp.promoDate ? formatDate(emp.promoDate) : '-') + '</td>' +
+                    gradeCols +
+                    '<td>' + emp.qualification + '</td>' +
+                    '<td>' + emp.remarks + '</td>';
+                    
+                tbody.appendChild(tr);
+            });
+            
+            updatePaginationControls(totalRecords);
+        }
+
+        // Handle Pagination State
+        function updatePaginationControls(totalRecords) {
+            var totalPages = Math.ceil(totalRecords / pageSize);
+            var prevBtn = document.getElementById('prevPageBtn');
+            var nextBtn = document.getElementById('nextPageBtn');
+            var pageLabel = document.getElementById('currentPageLabel');
+            
+            pageLabel.innerText = 'Page ' + currentPage + ' of ' + (totalPages > 0 ? totalPages : 1);
+            
+            prevBtn.disabled = (currentPage === 1);
+            nextBtn.disabled = (currentPage === totalPages || totalPages === 0);
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        }
+
+        function nextPage() {
+            var totalPages = Math.ceil(filteredEmployees.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        }
+
+        function changePageSize() {
+            var selectSize = document.getElementById('pageSizeSelect').value;
+            if (selectSize === 'ALL') {
+                pageSize = filteredEmployees.length > 0 ? filteredEmployees.length : 100;
+            } else {
+                pageSize = parseInt(selectSize);
+            }
+            currentPage = 1;
+            renderTable();
+        }
+    </script>
 </body>
 </html>

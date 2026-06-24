@@ -673,7 +673,7 @@
                                     <% } %>
                                 </tr>
                                 <tr>
-                                    <% for (int g = 10; g >= 1; g--) { 
+                                    <% for (int g = 10; g >= 1; g--) {
                                         if (activeGrades[g]) {
                                             String dName = Employee.getDesignationForGrade("Grade " + g);
                                             String shortD = dName.indexOf("(") > -1 ? dName.substring(dName.indexOf("(")+1, dName.indexOf(")")) : dName;
@@ -734,7 +734,7 @@
                                         </td>
                                         <td><%= emp.getGrade() %></td>
                                         
-                                        <% for (int g = 10; g >= 1; g--) { 
+                                        <% for (int g = 10; g >= 1; g--) {
                                             if (activeGrades[g]) {
                                                 java.util.Date pDate = emp.getPromotionDateForGrade("Grade " + g);
                                         %>

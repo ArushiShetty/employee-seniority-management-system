@@ -25,6 +25,9 @@ Seniority is calculated dynamically using the following fallback order:
 
 ---
 
-If you need to show the app offline:
-1. Open the standalone **`index.html`** file in the root folder in any web browser.
-2. It runs 100% offline with full features, styling, and mockup data, loading images from the local `WebContent/images` directory.
+## 📱 How to Demo Offline (Without Laptop/Wi-Fi/USB)
+
+If you need to show the app to your mentor on their computer or a phone/tablet offline:
+1. Copy the standalone **`index.html`** file in the root folder to your phone or tablet.
+2. Open **`index.html`** in any web browser. 
+3. It runs 100% offline with full features, styling, and mockup data without requiring a server or database.

@@ -15,12 +15,12 @@ import com.hal.hrms.util.DBConnection;
 
 public class EmployeeDAO {
 
-    // Thread-safe in-memory cache to hold records (DB entries + new insertions)
+    // Thread-safe in-memory cache to hold records (DB entries + fallback insertions)
     private static List inMemoryEmployees = null;
 
     /**
      * Initializes the static list by loading official employee records 
-     * from the read-only Oracle database.
+     * from the Oracle database, or falling back to in-memory seed data.
      */
     private synchronized void initMemoryStore() {
         if (inMemoryEmployees != null) {
@@ -47,10 +47,52 @@ public class EmployeeDAO {
             String colEmpDept = DBConnection.getProperty("col.emp.dept");
             String colEmpDesig = DBConnection.getProperty("col.emp.desig");
             
+            // New column configurations
+            String colEmpDiv = DBConnection.getProperty("col.emp.division");
+            String colEmpComplex = DBConnection.getProperty("col.emp.complex");
+            String colEmpDiscipline = DBConnection.getProperty("col.emp.discipline");
+            String colEmpGender = DBConnection.getProperty("col.emp.gender");
+            String colEmpExDtMt = DBConnection.getProperty("col.emp.ex_dt_mt");
+            String colEmpExServicemen = DBConnection.getProperty("col.emp.ex_servicemen");
+            String colEmpPhp = DBConnection.getProperty("col.emp.php");
+            String colEmpCategory = DBConnection.getProperty("col.emp.category");
+            String colEmpAbsDate = DBConnection.getProperty("col.emp.date_of_absorption");
+            String colEmpEdu = DBConnection.getProperty("col.emp.educational_qualification");
+            String colEmpRemarks = DBConnection.getProperty("col.emp.remarks");
+
+            // Defaults in case configuration properties are not present
+            if (tEmp == null) tEmp = "MST_EMPLOYEES";
+            if (colEmpId == null) colEmpId = "employee_id";
+            if (colEmpName == null) colEmpName = "employee_name";
+            if (colEmpGrade == null) colEmpGrade = "grade";
+            if (colEmpLevel == null) colEmpLevel = "emp_level";
+            if (colEmpPromoDate == null) colEmpPromoDate = "promotion_date";
+            if (colEmpDoj == null) colEmpDoj = "date_of_joining";
+            if (colEmpDob == null) colEmpDob = "date_of_birth";
+            if (colEmpDept == null) colEmpDept = "department";
+            if (colEmpDesig == null) colEmpDesig = "designation";
+            
+            if (colEmpDiv == null) colEmpDiv = "division";
+            if (colEmpComplex == null) colEmpComplex = "complex";
+            if (colEmpDiscipline == null) colEmpDiscipline = "discipline";
+            if (colEmpGender == null) colEmpGender = "gender";
+            if (colEmpExDtMt == null) colEmpExDtMt = "ex_dt_mt";
+            if (colEmpExServicemen == null) colEmpExServicemen = "ex_servicemen";
+            if (colEmpPhp == null) colEmpPhp = "php";
+            if (colEmpCategory == null) colEmpCategory = "category";
+            if (colEmpAbsDate == null) colEmpAbsDate = "date_of_absorption";
+            if (colEmpEdu == null) colEmpEdu = "educational_qualification";
+            if (colEmpRemarks == null) colEmpRemarks = "remarks";
+
             // 1. Fetch active Employee files
             String sql = "SELECT " + colEmpId + ", " + colEmpName + ", " + colEmpGrade + ", " +
                          colEmpLevel + ", " + colEmpPromoDate + ", " + colEmpDoj + ", " +
-                         colEmpDob + ", " + colEmpDept + ", " + colEmpDesig + " FROM " + tEmp;
+                         colEmpDob + ", " + colEmpDept + ", " + colEmpDesig + ", " +
+                         colEmpDiv + ", " + colEmpComplex + ", " + colEmpDiscipline + ", " +
+                         colEmpGender + ", " + colEmpExDtMt + ", " + colEmpExServicemen + ", " +
+                         colEmpPhp + ", " + colEmpCategory + ", " + colEmpAbsDate + ", " +
+                         colEmpEdu + ", " + colEmpRemarks + " FROM " + tEmp;
+                         
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
             
@@ -65,6 +107,20 @@ public class EmployeeDAO {
                 emp.setDateOfBirth(rs.getDate(colEmpDob));
                 emp.setDepartment(rs.getString(colEmpDept) != null ? rs.getString(colEmpDept).trim() : "");
                 emp.setDesignation(rs.getString(colEmpDesig) != null ? rs.getString(colEmpDesig).trim() : "");
+                
+                // Set new fields
+                emp.setDivision(rs.getString(colEmpDiv) != null ? rs.getString(colEmpDiv).trim() : "");
+                emp.setComplex(rs.getString(colEmpComplex) != null ? rs.getString(colEmpComplex).trim() : "");
+                emp.setDiscipline(rs.getString(colEmpDiscipline) != null ? rs.getString(colEmpDiscipline).trim() : "");
+                emp.setGender(rs.getString(colEmpGender) != null ? rs.getString(colEmpGender).trim() : "");
+                emp.setExDtMt(rs.getString(colEmpExDtMt) != null ? rs.getString(colEmpExDtMt).trim() : "");
+                emp.setExServicemen(rs.getString(colEmpExServicemen) != null ? rs.getString(colEmpExServicemen).trim() : "");
+                emp.setPhp(rs.getString(colEmpPhp) != null ? rs.getString(colEmpPhp).trim() : "");
+                emp.setCategory(rs.getString(colEmpCategory) != null ? rs.getString(colEmpCategory).trim() : "");
+                emp.setDateOfAbsorption(rs.getDate(colEmpAbsDate));
+                emp.setEducationalQualification(rs.getString(colEmpEdu) != null ? rs.getString(colEmpEdu).trim() : "");
+                emp.setRemarks(rs.getString(colEmpRemarks) != null ? rs.getString(colEmpRemarks).trim() : "");
+                
                 emp.setHistoryList(new ArrayList());
                 inMemoryEmployees.add(emp);
             }
@@ -84,10 +140,22 @@ public class EmployeeDAO {
             String colPromoAssignmentType = DBConnection.getProperty("col.promo.assignment_type");
             String colPromoOrderNum = DBConnection.getProperty("col.promo.order_num");
             
+            if (tPromo == null) tPromo = "TRN_PROMOTIONS";
+            if (colPromoEmpId == null) colPromoEmpId = "employee_id";
+            if (colPromoGrade == null) colPromoGrade = "grade";
+            if (colPromoDate == null) colPromoDate = "promotion_date";
+            if (colPromoPosCode == null) colPromoPosCode = "pos_code";
+            if (colPromoValidFrom == null) colPromoValidFrom = "valid_from";
+            if (colPromoValidTo == null) colPromoValidTo = "valid_to";
+            if (colPromoIsPrimary == null) colPromoIsPrimary = "is_primary";
+            if (colPromoAssignmentType == null) colPromoAssignmentType = "assignment_type";
+            if (colPromoOrderNum == null) colPromoOrderNum = "order_number";
+
             // 2. Fetch all historical promotion milestones and link them to employees
             String sqlPromo = "SELECT " + colPromoEmpId + ", " + colPromoGrade + ", " + colPromoDate + ", " +
                               colPromoPosCode + ", " + colPromoValidFrom + ", " + colPromoValidTo + ", " +
                               colPromoIsPrimary + ", " + colPromoAssignmentType + ", " + colPromoOrderNum + " FROM " + tPromo;
+            
             pstmt = conn.prepareStatement(sqlPromo);
             rs = pstmt.executeQuery();
             
@@ -117,430 +185,138 @@ public class EmployeeDAO {
             
         } catch (SQLException e) {
             System.err.println("Warning: Could not connect to Oracle database server. Initializing with demo fallback records.");
-            e.printStackTrace();
         } finally {
             if (rs != null) { try { rs.close(); } catch (SQLException e) {} }
             if (pstmt != null) { try { pstmt.close(); } catch (SQLException e) {} }
             if (conn != null) { try { conn.close(); } catch (SQLException e) {} }
         }
 
-        // Fallback for demo when database is not connected
+        // Fallback for demo/offline operations when database is not connected
         if (inMemoryEmployees.isEmpty()) {
             loadDemoData();
         }
     }
 
     /**
-     * Loads standard demo data matching schema.sql so the app is immediately usable.
+     * Seeds 1,000 detailed employee records (100 per grade) for high-performance offline demonstration.
      */
     private void loadDemoData() {
         inMemoryEmployees = new ArrayList();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        
+        String[] firstNames = {"Amit", "Rohan", "Sanjay", "Karan", "Vijay", "Anand", "Deepak", "Vikram", "Sunil", "Rajesh", "Manoj", "Pradeep", "Ashok", "Suresh", "Ramesh", "Ajay", "Dinesh", "Harish", "Arvind", "Sandeep", "Kunal", "Varun", "Arjun", "Vinay", "Alok", "Rahul", "Pankaj", "Abhishek", "Gaurav", "Siddharth"};
+        String[] lastNames = {"Patil", "Nair", "Joshi", "Iyer", "Rao", "Reddy", "Mehta", "Gowda", "Mishra", "Gupta", "Sen", "Bose", "Das", "Roy", "Sharma", "Singh", "Prasad", "Verma", "Pillai", "Kulkarni", "Choudhury", "Banerjee", "Chatterjee", "Dubey", "Dwivedi", "Tripathi", "Pandey"};
+        
+        String[] divisions = {"OVERHAUL", "AIRCRAFT", "ENGINE", "HELICOPTER", "AVIONICS", "ACCESSORIES", "TRANSPORT", "MCMRDC", "AERDC"};
+        String[] disciplines = {"Technical", "HR", "Finance", "IT", "Materials Management", "Legal", "Security", "PR"};
+        String[] qualifications = {"BE (Aero)", "B.Tech (Mech)", "BE (ECE)", "B.Tech (CS)", "MBA (HR)", "CA", "ICWA", "LLB", "M.Tech", "PhD"};
+        
         try {
-            // Employee 1: M. Visvesvaraya (Grade 10)
-            Employee e1 = new Employee();
-            e1.setEmployeeId("103499");
-            e1.setEmployeeName("M. Visvesvaraya");
-            e1.setGrade("Grade 10");
-            e1.setEmpLevel("Level 3");
-            e1.setPromotionDate(sdf.parse("2025-07-01"));
-            e1.setDateOfJoining(sdf.parse("1992-06-01"));
-            e1.setDateOfBirth(sdf.parse("1967-11-20"));
-            e1.setDepartment("Overhaul Division");
-            e1.setDesignation("General Manager");
-            List h1 = new ArrayList();
-            
-            Promotion p1_1 = new Promotion();
-            p1_1.setEmployeeId("103499");
-            p1_1.setGrade("Grade 9");
-            p1_1.setPromotionDate(sdf.parse("2020-07-01"));
-            p1_1.setDesignation("Additional General Manager (Overhaul)");
-            p1_1.setValidFrom(sdf.parse("2021-05-21"));
-            p1_1.setValidTo(sdf.parse("2024-06-30"));
-            p1_1.setAssignmentType("TRANSFER");
-            p1_1.setIsPrimary(0);
-            h1.add(p1_1);
-            
-            Promotion p1_2 = new Promotion();
-            p1_2.setEmployeeId("103499");
-            p1_2.setGrade("Grade 10");
-            p1_2.setPromotionDate(sdf.parse("2025-07-01"));
-            p1_2.setDesignation("General Manager (Overhaul)");
-            p1_2.setValidFrom(sdf.parse("2025-11-01"));
-            p1_2.setValidTo(sdf.parse("2030-12-31"));
-            p1_2.setAssignmentType("JOB ROTATION");
-            p1_2.setIsPrimary(1);
-            h1.add(p1_2);
-            
-            e1.setHistoryList(h1);
-            inMemoryEmployees.add(e1);
-
-            // Employee 2: Rajesh Kumar Sharma (Grade 9)
-            Employee e2 = new Employee();
-            e2.setEmployeeId("103225");
-            e2.setEmployeeName("Rajesh Kumar Sharma");
-            e2.setGrade("Grade 9");
-            e2.setEmpLevel("Level 2");
-            e2.setPromotionDate(sdf.parse("2025-07-01"));
-            e2.setDateOfJoining(sdf.parse("1995-07-01"));
-            e2.setDateOfBirth(sdf.parse("1970-04-12"));
-            e2.setDepartment("LCA Division");
-            e2.setDesignation("Additional General Manager");
-            List h2 = new ArrayList();
-            
-            Promotion p2_1 = new Promotion();
-            p2_1.setEmployeeId("103225");
-            p2_1.setGrade("Grade 8");
-            p2_1.setPromotionDate(sdf.parse("2015-07-01"));
-            p2_1.setDesignation("Deputy General Manager - Section Head (LCA)");
-            p2_1.setValidFrom(sdf.parse("2022-09-01"));
-            p2_1.setValidTo(sdf.parse("2022-12-30"));
-            p2_1.setAssignmentType("TRANSFER");
-            p2_1.setIsPrimary(0);
-            h2.add(p2_1);
-
-            Promotion p2_1_b = new Promotion();
-            p2_1_b.setEmployeeId("103225");
-            p2_1_b.setGrade("Grade 8");
-            p2_1_b.setPromotionDate(sdf.parse("2015-07-01"));
-            p2_1_b.setDesignation("Deputy General Manager (Management Services - Information Technology)");
-            p2_1_b.setValidFrom(sdf.parse("2024-05-24"));
-            p2_1_b.setValidTo(sdf.parse("2025-06-30"));
-            p2_1_b.setAssignmentType("JOB ROTATION");
-            p2_1_b.setIsPrimary(0);
-            h2.add(p2_1_b);
-
-            Promotion p2_2 = new Promotion();
-            p2_2.setEmployeeId("103225");
-            p2_2.setGrade("Grade 9");
-            p2_2.setPromotionDate(sdf.parse("2025-07-01"));
-            p2_2.setDesignation("Additional General Manager (Management Services & IT Project Management)");
-            p2_2.setValidFrom(sdf.parse("2025-07-22"));
-            p2_2.setValidTo(sdf.parse("2026-08-31"));
-            p2_2.setAssignmentType("ADDITIONAL RESPONSIBILITIES");
-            p2_2.setIsPrimary(1);
-            h2.add(p2_2);
-            
-            e2.setHistoryList(h2);
-            inMemoryEmployees.add(e2);
-
-            // Employee 3: Sunil Dev (Grade 7)
-            Employee e3 = new Employee();
-            e3.setEmployeeId("104725");
-            e3.setEmployeeName("Sunil Dev");
-            e3.setGrade("Grade 7");
-            e3.setEmpLevel("Level 1");
-            e3.setPromotionDate(sdf.parse("2024-07-01"));
-            e3.setDateOfJoining(sdf.parse("2005-01-01"));
-            e3.setDateOfBirth(sdf.parse("1980-08-15"));
-            e3.setDepartment("Services Dept");
-            e3.setDesignation("Chief Manager");
-            List h3 = new ArrayList();
-            
-            Promotion p3_1 = new Promotion();
-            p3_1.setEmployeeId("104725");
-            p3_1.setGrade("Grade 5");
-            p3_1.setPromotionDate(sdf.parse("2013-07-01"));
-            p3_1.setDesignation("Manager (Services - Housekeeping)");
-            p3_1.setValidFrom(sdf.parse("2013-05-03"));
-            p3_1.setValidTo(sdf.parse("2019-06-30"));
-            p3_1.setAssignmentType("TRANSFER");
-            p3_1.setIsPrimary(0);
-            h3.add(p3_1);
-            
-            Promotion p3_2 = new Promotion();
-            p3_2.setEmployeeId("104725");
-            p3_2.setGrade("Grade 6");
-            p3_2.setPromotionDate(sdf.parse("2019-07-01"));
-            p3_2.setDesignation("Senior Manager (Services - Housekeeping)");
-            p3_2.setValidFrom(sdf.parse("2019-07-01"));
-            p3_2.setValidTo(sdf.parse("2024-06-30"));
-            p3_2.setAssignmentType("DPC");
-            p3_2.setIsPrimary(0);
-            h3.add(p3_2);
-            
-            Promotion p3_3 = new Promotion();
-            p3_3.setEmployeeId("104725");
-            p3_3.setGrade("Grade 7");
-            p3_3.setPromotionDate(sdf.parse("2024-07-01"));
-            p3_3.setDesignation("Chief Manager (Services - Housekeeping)");
-            p3_3.setValidFrom(sdf.parse("2024-07-01"));
-            p3_3.setValidTo(sdf.parse("2039-02-28"));
-            p3_3.setAssignmentType("DPC");
-            p3_3.setIsPrimary(1);
-            h3.add(p3_3);
-            
-            e3.setHistoryList(h3);
-            inMemoryEmployees.add(e3);
-
-            // Employee 4: Anil K. V. (Grade 4)
-            Employee e4 = new Employee();
-            e4.setEmployeeId("120016");
-            e4.setEmployeeName("Anil K. V.");
-            e4.setGrade("Grade 4");
-            e4.setEmpLevel("Level 1");
-            e4.setPromotionDate(sdf.parse("2023-01-01"));
-            e4.setDateOfJoining(sdf.parse("2012-12-14"));
-            e4.setDateOfBirth(sdf.parse("1992-05-05"));
-            e4.setDepartment("Jet Engine Overhaul");
-            e4.setDesignation("Highly Skilled Technician");
-            List h4 = new ArrayList();
-            
-            Promotion p4_1 = new Promotion();
-            p4_1.setEmployeeId("120016");
-            p4_1.setGrade("Grade 1");
-            p4_1.setPromotionDate(sdf.parse("2012-12-14"));
-            p4_1.setDesignation("Trainee Technician (Fitter)");
-            p4_1.setValidFrom(sdf.parse("2012-12-14"));
-            p4_1.setValidTo(sdf.parse("2013-12-13"));
-            p4_1.setAssignmentType("TRAINEE");
-            p4_1.setIsPrimary(0);
-            h4.add(p4_1);
-            
-            Promotion p4_2 = new Promotion();
-            p4_2.setEmployeeId("120016");
-            p4_2.setGrade("Grade 2");
-            p4_2.setPromotionDate(sdf.parse("2012-12-14"));
-            p4_2.setDesignation("Technician (Fitter)");
-            p4_2.setValidFrom(sdf.parse("2013-12-14"));
-            p4_2.setValidTo(sdf.parse("2015-03-05"));
-            p4_2.setAssignmentType("ABSORPTION");
-            p4_2.setIsPrimary(0);
-            h4.add(p4_2);
-            
-            Promotion p4_3 = new Promotion();
-            p4_3.setEmployeeId("120016");
-            p4_3.setGrade("Grade 3");
-            p4_3.setPromotionDate(sdf.parse("2017-01-01"));
-            p4_3.setDesignation("Senior Technician (Fitter)");
-            p4_3.setValidFrom(sdf.parse("2017-01-01"));
-            p4_3.setValidTo(sdf.parse("2020-01-13"));
-            p4_3.setAssignmentType("CPS");
-            p4_3.setIsPrimary(0);
-            h4.add(p4_3);
-            
-            Promotion p4_4 = new Promotion();
-            p4_4.setEmployeeId("120016");
-            p4_4.setGrade("Grade 4");
-            p4_4.setPromotionDate(sdf.parse("2023-01-01"));
-            p4_4.setDesignation("Highly Skilled Technician (Fitter)");
-            p4_4.setValidFrom(sdf.parse("2023-01-01"));
-            p4_4.setValidTo(sdf.parse("2045-02-28"));
-            p4_4.setAssignmentType("CPS");
-            p4_4.setIsPrimary(1);
-            h4.add(p4_4);
-            
-            e4.setHistoryList(h4);
-            inMemoryEmployees.add(e4);
-
-            // Employee 5: Balaji Prasad (Grade 4)
-            Employee e5 = new Employee();
-            e5.setEmployeeId("120018");
-            e5.setEmployeeName("Balaji Prasad");
-            e5.setGrade("Grade 4");
-            e5.setEmpLevel("Level 1");
-            e5.setPromotionDate(sdf.parse("2023-01-01"));
-            e5.setDateOfJoining(sdf.parse("2012-12-17"));
-            e5.setDateOfBirth(sdf.parse("1991-03-14"));
-            e5.setDepartment("Jet Engine Overhaul");
-            e5.setDesignation("Highly Skilled Technician");
-            List h5 = new ArrayList();
-            
-            Promotion p5_1 = new Promotion();
-            p5_1.setEmployeeId("120018");
-            p5_1.setGrade("Grade 1");
-            p5_1.setPromotionDate(sdf.parse("2012-12-17"));
-            p5_1.setDesignation("Trainee Technician (Fitter)");
-            p5_1.setValidFrom(sdf.parse("2012-12-17"));
-            p5_1.setValidTo(sdf.parse("2013-12-16"));
-            p5_1.setAssignmentType("TRAINEE");
-            p5_1.setIsPrimary(0);
-            h5.add(p5_1);
-            
-            Promotion p5_2 = new Promotion();
-            p5_2.setEmployeeId("120018");
-            p5_2.setGrade("Grade 2");
-            p5_2.setPromotionDate(sdf.parse("2012-12-17"));
-            p5_2.setDesignation("Technician (Fitter)");
-            p5_2.setValidFrom(sdf.parse("2013-12-17"));
-            p5_2.setValidTo(sdf.parse("2015-03-05"));
-            p5_2.setAssignmentType("ABSORPTION");
-            p5_2.setIsPrimary(0);
-            h5.add(p5_2);
-            
-            Promotion p5_3 = new Promotion();
-            p5_3.setEmployeeId("120018");
-            p5_3.setGrade("Grade 3");
-            p5_3.setPromotionDate(sdf.parse("2017-01-01"));
-            p5_3.setDesignation("Senior Technician (Fitter)");
-            p5_3.setValidFrom(sdf.parse("2017-01-01"));
-            p5_3.setValidTo(sdf.parse("2020-01-13"));
-            p5_3.setAssignmentType("CPS");
-            p5_3.setIsPrimary(0);
-            h5.add(p5_3);
-            
-            Promotion p5_4 = new Promotion();
-            p5_4.setEmployeeId("120018");
-            p5_4.setGrade("Grade 4");
-            p5_4.setPromotionDate(sdf.parse("2023-01-01"));
-            p5_4.setDesignation("Highly Skilled Technician (Fitter)");
-            p5_4.setValidFrom(sdf.parse("2023-01-01"));
-            p5_4.setValidTo(sdf.parse("2048-08-31"));
-            p5_4.setAssignmentType("CPS");
-            p5_4.setIsPrimary(1);
-            h5.add(p5_4);
-            
-            e5.setHistoryList(h5);
-            inMemoryEmployees.add(e5);
-
-            // Employee 6: Chinnaswamy M. (Grade 4)
-            Employee e6 = new Employee();
-            e6.setEmployeeId("120020");
-            e6.setEmployeeName("Chinnaswamy M.");
-            e6.setGrade("Grade 4");
-            e6.setEmpLevel("Level 1");
-            e6.setPromotionDate(sdf.parse("2023-01-01"));
-            e6.setDateOfJoining(sdf.parse("2012-12-26"));
-            e6.setDateOfBirth(sdf.parse("1990-10-10"));
-            e6.setDepartment("Jet Engine Overhaul");
-            e6.setDesignation("Highly Skilled Technician");
-            List h6 = new ArrayList();
-            
-            Promotion p6_1 = new Promotion();
-            p6_1.setEmployeeId("120020");
-            p6_1.setGrade("Grade 1");
-            p6_1.setPromotionDate(sdf.parse("2012-12-26"));
-            p6_1.setDesignation("Trainee Technician (Fitter)");
-            p6_1.setValidFrom(sdf.parse("2012-12-26"));
-            p6_1.setValidTo(sdf.parse("2013-12-25"));
-            p6_1.setAssignmentType("TRAINEE");
-            p6_1.setIsPrimary(0);
-            h6.add(p6_1);
-            
-            Promotion p6_2 = new Promotion();
-            p6_2.setEmployeeId("120020");
-            p6_2.setGrade("Grade 2");
-            p6_2.setPromotionDate(sdf.parse("2012-12-26"));
-            p6_2.setDesignation("Technician (Fitter)");
-            p6_2.setValidFrom(sdf.parse("2013-12-26"));
-            p6_2.setValidTo(sdf.parse("2015-03-05"));
-            p6_2.setAssignmentType("ABSORPTION");
-            p6_2.setIsPrimary(0);
-            h6.add(p6_2);
-            
-            Promotion p6_3 = new Promotion();
-            p6_3.setEmployeeId("120020");
-            p6_3.setGrade("Grade 3");
-            p6_3.setPromotionDate(sdf.parse("2017-01-01"));
-            p6_3.setDesignation("Senior Technician (Fitter)");
-            p6_3.setValidFrom(sdf.parse("2017-01-01"));
-            p6_3.setValidTo(sdf.parse("2020-01-13"));
-            p6_3.setAssignmentType("CPS");
-            p6_3.setIsPrimary(0);
-            h6.add(p6_3);
-            
-            Promotion p6_4 = new Promotion();
-            p6_4.setEmployeeId("120020");
-            p6_4.setGrade("Grade 4");
-            p6_4.setPromotionDate(sdf.parse("2023-01-01"));
-            p6_4.setDesignation("Highly Skilled Technician (Fitter)");
-            p6_4.setValidFrom(sdf.parse("2023-01-01"));
-            p6_4.setValidTo(sdf.parse("2044-06-30"));
-            p6_4.setAssignmentType("CPS");
-            p6_4.setIsPrimary(1);
-            h6.add(p6_4);
-            
-            e6.setHistoryList(h6);
-            inMemoryEmployees.add(e6);
-
-            // Programmatically generate at least 10 employees for every grade (Grade 1 to 10)
-            String[] firstNames = {"Amit", "Rohan", "Sanjay", "Karan", "Vijay", "Anand", "Deepak", "Vikram", "Sunil", "Rajesh", "Manoj", "Pradeep", "Ashok", "Suresh", "Ramesh", "Ajay", "Dinesh", "Harish", "Arvind", "Sandeep"};
-            String[] lastNames = {"Patil", "Nair", "Joshi", "Iyer", "Rao", "Reddy", "Mehta", "Gowda", "Mishra", "Gupta", "Sen", "Bose", "Das", "Roy", "Nair", "Kumar", "Sharma", "Singh", "Prasad", "Verma"};
-            String[] depts = {"LCA Assembly", "Overhaul Engine", "Jet Avionics", "Services Maintenance", "Purchase Logistics", "Information Systems", "Finance Accounting", "Human Resources"};
-            
-            String[] olderNames = {
-                "",
-                "Aarav Patil",
-                "Rohan Nair",
-                "Sanjay Joshi",
-                "Karan Iyer",
-                "Vijay Rao",
-                "Anand Reddy",
-                "Deepak Mehta",
-                "Vikram Gowda",
-                "Sunil Mishra",
-                "Rajesh Gupta"
-            };
-            String[] youngerNames = {
-                "",
-                "Alok Deshmukh",
-                "Rahul Pillai",
-                "Sandeep Kulkarni",
-                "Kunal Menon",
-                "Varun Hegde",
-                "Arjun Naidu",
-                "Dinesh Shah",
-                "Vinay Shettigar",
-                "Suresh Pandey",
-                "Ramesh Bansal"
-            };
-
+            // Seed exactly 100 employees per grade (Grade 1 to 10) -> Total 1,000 records
             for (int g = 1; g <= 10; g++) {
-                for (int k = 0; k < 12; k++) {
-                    int empIdInt = 120000 + (g * 100) + k;
+                String gradeKey = "Grade " + g;
+                
+                for (int k = 0; k < 100; k++) {
+                    int empIdInt = 100000 + (g * 1000) + k;
                     String empIdStr = String.valueOf(empIdInt);
                     
-                    String firstName, lastName, fullName, dept;
-                    int careerDurationYears = (g - 1) * 3;
-                    int currentPromoYear, joinYear;
-                    Date doj, dob;
+                    // Dynamic name selection
+                    String firstName = firstNames[(g * k + k) % firstNames.length];
+                    String lastName = lastNames[(g * k + g) % lastNames.length];
+                    String fullName = firstName + " " + lastName;
                     
-                    if (k >= 10) {
-                        dept = "Overhaul Engine";
-                        currentPromoYear = 2022;
-                        joinYear = currentPromoYear - careerDurationYears;
-                        doj = sdf.parse(joinYear + "-05-15");
-                        
-                        if (k == 10) {
-                            fullName = olderNames[g];
-                            dob = sdf.parse((joinYear - 28) + "-04-12");
-                        } else {
-                            fullName = youngerNames[g];
-                            dob = sdf.parse((joinYear - 24) + "-08-25");
-                        }
+                    // Division & Discipline selection
+                    String division = divisions[(g + k) % divisions.length];
+                    // Make 70% technical and 30% non-technical
+                    String discipline = ((g + k) % 10 < 7) ? "Technical" : disciplines[(g * k) % (disciplines.length - 1) + 1];
+                    
+                    // Designation mapping based on Grade and Discipline
+                    String designation = Employee.getDesignationForGrade(gradeKey);
+                    if (!"Technical".equals(discipline)) {
+                        // Adapt designation slightly for non-technical fields
+                        if ("Grade 1".equals(gradeKey)) designation = "Assistant Officer (" + discipline + ")";
+                        else if ("Grade 2".equals(gradeKey)) designation = "Officer (" + discipline + ")";
+                        else designation = designation + " (" + discipline + ")";
                     } else {
-                        firstName = firstNames[(g * k + k) % firstNames.length];
-                        lastName = lastNames[(g * k + g) % lastNames.length];
-                        fullName = firstName + " " + lastName;
-                        dept = depts[(g + k) % depts.length];
-                        
-                        currentPromoYear = 2020 + (k % 6);
-                        joinYear = currentPromoYear - careerDurationYears;
-                        
-                        int joinMonth = 1 + (k % 12);
-                        int joinDay = 1 + (k * 7) % 28;
-                        String joinMonthStr = joinMonth < 10 ? "0" + joinMonth : "" + joinMonth;
-                        String joinDayStr = joinDay < 10 ? "0" + joinDay : "" + joinDay;
-                        doj = sdf.parse(joinYear + "-" + joinMonthStr + "-" + joinDayStr);
-                        
-                        int birthYear = joinYear - 22 - (k % 5);
-                        int birthMonth = 1 + ((k + 3) % 12);
-                        int birthDay = 1 + ((k * 3) % 28);
-                        String birthMonthStr = birthMonth < 10 ? "0" + birthMonth : "" + birthMonth;
-                        String birthDayStr = birthDay < 10 ? "0" + birthDay : "" + birthDay;
-                        dob = sdf.parse(birthYear + "-" + birthMonthStr + "-" + birthDayStr);
+                        designation = designation + " (Technical)";
                     }
                     
+                    // Determine dates logically
+                    // Career duration: Grade 1 has 0-3 years, Grade 10 has 27-30 years
+                    int careerDurationYears = (g - 1) * 3 + (k % 3);
+                    int currentPromoYear = 2025 - (k % 4); // Promoted recently in last 0-3 years
+                    int joinYear = currentPromoYear - careerDurationYears;
+                    
+                    int joinMonth = 1 + (k % 12);
+                    int joinDay = 1 + (k * 7) % 28;
+                    String joinMonthStr = joinMonth < 10 ? "0" + joinMonth : "" + joinMonth;
+                    String joinDayStr = joinDay < 10 ? "0" + joinDay : "" + joinDay;
+                    Date doj = sdf.parse(joinYear + "-" + joinMonthStr + "-" + joinDayStr);
+                    
+                    // Age at joining: 22 to 26 years
+                    int birthYear = joinYear - 22 - (k % 5);
+                    int birthMonth = 1 + ((k + 3) % 12);
+                    int birthDay = 1 + ((k * 3) % 28);
+                    // Special test case for birth on the 1st of the month
+                    if (k % 15 == 0) {
+                        birthDay = 1;
+                    }
+                    String birthMonthStr = birthMonth < 10 ? "0" + birthMonth : "" + birthMonth;
+                    String birthDayStr = birthDay < 10 ? "0" + birthDay : "" + birthDay;
+                    Date dob = sdf.parse(birthYear + "-" + birthMonthStr + "-" + birthDayStr);
+                    
+                    // DT/MT/NA selection
+                    String exDtMt = "NA";
+                    if (k % 3 == 0) {
+                        exDtMt = "Technical".equals(discipline) ? "DT" : "MT";
+                    } else if (k % 3 == 1) {
+                        exDtMt = "MT";
+                    }
+                    
+                    // Date of Absorption (1 year after DOJ for DT/MT, otherwise same as DOJ)
+                    Date absDate = doj;
+                    if ("DT".equals(exDtMt) || "MT".equals(exDtMt)) {
+                        absDate = sdf.parse((joinYear + 1) + "-" + joinMonthStr + "-" + joinDayStr);
+                    }
+                    
+                    // Ex-Servicemen and PHP indicators (small percentages)
+                    String exServicemen = (k % 25 == 0) ? "Y" : "N";
+                    String php = (k % 33 == 0) ? "Y" : "N";
+                    
+                    // Caste Category
+                    String[] categories = {"Gen", "Gen", "OBC", "OBC", "SC", "ST"};
+                    String category = categories[(g * k) % categories.length];
+                    
+                    // Gender
+                    String gender = (k % 4 == 0) ? "Female" : "Male";
+                    
+                    // Educational Qualification
+                    String qual = qualifications[(g + k) % qualifications.length];
+                    
+                    // Assemble Employee Object
                     Employee emp = new Employee();
                     emp.setEmployeeId(empIdStr);
                     emp.setEmployeeName(fullName);
-                    emp.setDepartment(dept);
+                    emp.setGrade(gradeKey);
+                    emp.setEmpLevel("Level " + (1 + (k % 4)));
                     emp.setDateOfJoining(doj);
                     emp.setDateOfBirth(dob);
+                    emp.setDateOfAbsorption(absDate);
+                    emp.setDepartment(discipline + " Dept");
+                    emp.setDesignation(designation);
+                    emp.setDivision(division);
+                    emp.setComplex(""); // Kept blank for manual entries later
+                    emp.setDiscipline(discipline);
+                    emp.setGender(gender);
+                    emp.setExDtMt(exDtMt);
+                    emp.setExServicemen(exServicemen);
+                    emp.setPhp(php);
+                    emp.setCategory(category);
+                    emp.setEducationalQualification(qual);
+                    emp.setRemarks(k % 20 == 0 ? "Verified by HR Division" : "");
                     
+                    // Build promotion history from Grade 1 up to current grade
                     List history = new ArrayList();
-                    Date currentPromoDate = doj;
-                    
                     for (int pg = 1; pg <= g; pg++) {
                         Promotion p = new Promotion();
                         p.setEmployeeId(empIdStr);
@@ -549,21 +325,17 @@ public class EmployeeDAO {
                         int promoYear = joinYear + (pg - 1) * 3;
                         Date pDate = sdf.parse(promoYear + "-07-01");
                         p.setPromotionDate(pDate);
-                        currentPromoDate = pDate;
                         
-                        String des = "Associate Grade " + pg;
-                        if (pg == 1) des = "Trainee (" + dept + ")";
-                        else if (pg == 2) des = "Technician (" + dept + ")";
-                        else if (pg == 3) des = "Senior Technician";
-                        else if (pg == 4) des = "Highly Skilled Technician";
-                        else if (pg == 5) des = "Deputy Manager";
-                        else if (pg == 6) des = "Manager";
-                        else if (pg == 7) des = "Senior Manager";
-                        else if (pg == 8) des = "Chief Manager";
-                        else if (pg == 9) des = "Deputy General Manager";
-                        else if (pg == 10) des = "General Manager";
+                        String promoDesig = Employee.getDesignationForGrade("Grade " + pg);
+                        if (!"Technical".equals(discipline)) {
+                            if (pg == 1) promoDesig = "Assistant Officer (" + discipline + ")";
+                            else if (pg == 2) promoDesig = "Officer (" + discipline + ")";
+                            else promoDesig = promoDesig + " (" + discipline + ")";
+                        } else {
+                            promoDesig = promoDesig + " (Technical)";
+                        }
                         
-                        p.setDesignation(des);
+                        p.setDesignation(promoDesig);
                         p.setValidFrom(pDate);
                         p.setOrderNumber("ORD-" + promoYear + "-GR" + pg + "-" + k);
                         
@@ -572,10 +344,7 @@ public class EmployeeDAO {
                             p.setIsPrimary(1);
                             p.setAssignmentType("CPS");
                             
-                            emp.setGrade("Grade " + g);
-                            emp.setEmpLevel("Level " + (1 + (k % 3)));
                             emp.setPromotionDate(pDate);
-                            emp.setDesignation(des);
                         } else {
                             int nextPromoYear = promoYear + 3;
                             p.setValidTo(sdf.parse(nextPromoYear + "-06-30"));
@@ -590,9 +359,9 @@ public class EmployeeDAO {
                     inMemoryEmployees.add(emp);
                 }
             }
-            System.out.println("Java In-Memory Cache initialized with demo fallback records.");
-        } catch (java.text.ParseException e) {
-            System.err.println("Error parsing demo dates:");
+            System.out.println("Java In-Memory Cache initialized with 1,000 detailed records.");
+        } catch (Exception e) {
+            System.err.println("Error parsing demo dates in EmployeeDAO:");
             e.printStackTrace();
         }
     }
@@ -637,6 +406,20 @@ public class EmployeeDAO {
                     copy.setDateOfBirth(e.getDateOfBirth());
                     copy.setDepartment(e.getDepartment());
                     copy.setDesignation(e.getDesignation());
+                    
+                    // Copy new fields
+                    copy.setDivision(e.getDivision());
+                    copy.setComplex(e.getComplex());
+                    copy.setDiscipline(e.getDiscipline());
+                    copy.setGender(e.getGender());
+                    copy.setExDtMt(e.getExDtMt());
+                    copy.setExServicemen(e.getExServicemen());
+                    copy.setPhp(e.getPhp());
+                    copy.setCategory(e.getCategory());
+                    copy.setDateOfAbsorption(e.getDateOfAbsorption());
+                    copy.setEducationalQualification(e.getEducationalQualification());
+                    copy.setRemarks(e.getRemarks());
+                    
                     copy.setRank(subRank++); // Rank within this specific grade category
                     copy.setHistoryList(e.getHistoryList());
                     filteredList.add(copy);
@@ -649,7 +432,7 @@ public class EmployeeDAO {
     }
 
     /**
-     * Registers a new employee profile in Java memory (Read-only DB workaround).
+     * Registers a new employee profile in Java memory.
      */
     public boolean addEmployee(Employee emp) {
         initMemoryStore();
@@ -715,6 +498,20 @@ public class EmployeeDAO {
                 e.setDateOfBirth(emp.getDateOfBirth());
                 e.setDepartment(emp.getDepartment());
                 e.setDesignation(emp.getDesignation());
+                
+                // Copy new fields
+                e.setDivision(emp.getDivision());
+                e.setComplex(emp.getComplex());
+                e.setDiscipline(emp.getDiscipline());
+                e.setGender(emp.getGender());
+                e.setExDtMt(emp.getExDtMt());
+                e.setExServicemen(emp.getExServicemen());
+                e.setPhp(emp.getPhp());
+                e.setCategory(emp.getCategory());
+                e.setDateOfAbsorption(emp.getDateOfAbsorption());
+                e.setEducationalQualification(emp.getEducationalQualification());
+                e.setRemarks(emp.getRemarks());
+                
                 return true;
             }
         }
@@ -769,7 +566,9 @@ public class EmployeeDAO {
             if (e.getEmployeeId().toLowerCase().indexOf(q) > -1 ||
                 e.getEmployeeName().toLowerCase().indexOf(q) > -1 ||
                 e.getDepartment().toLowerCase().indexOf(q) > -1 ||
-                e.getDesignation().toLowerCase().indexOf(q) > -1) {
+                e.getDesignation().toLowerCase().indexOf(q) > -1 ||
+                e.getDivision().toLowerCase().indexOf(q) > -1 ||
+                e.getDiscipline().toLowerCase().indexOf(q) > -1) {
                 results.add(e);
             }
         }

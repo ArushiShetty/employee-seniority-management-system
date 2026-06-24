@@ -1,0 +1,117 @@
+19-Jun-2026 08:25:23.757 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.98
+19-Jun-2026 08:25:23.760 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Dec 5 2024 19:50:29 UTC
+19-Jun-2026 08:25:23.766 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.98.0
+19-Jun-2026 08:25:23.766 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 11
+19-Jun-2026 08:25:23.766 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+19-Jun-2026 08:25:23.766 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+19-Jun-2026 08:25:23.766 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Eclipse Adoptium\jdk-8.0.492.9-hotspot\jre
+19-Jun-2026 08:25:23.766 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           1.8.0_492-b09
+19-Jun-2026 08:25:23.766 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Temurin
+19-Jun-2026 08:25:23.767 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         C:\HAL Internship\tomcat
+19-Jun-2026 08:25:23.767 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         C:\HAL Internship\tomcat
+19-Jun-2026 08:25:23.771 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=c:\HAL Internship\tomcat\conf\logging.properties
+19-Jun-2026 08:25:23.772 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+19-Jun-2026 08:25:23.772 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djdk.tls.ephemeralDHKeySize=2048
+19-Jun-2026 08:25:23.772 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.protocol.handler.pkgs=org.apache.catalina.webresources
+19-Jun-2026 08:25:23.773 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dignore.endorsed.dirs=
+19-Jun-2026 08:25:23.773 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=c:\HAL Internship\tomcat
+19-Jun-2026 08:25:23.773 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=c:\HAL Internship\tomcat
+19-Jun-2026 08:25:23.773 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=c:\HAL Internship\tomcat\temp
+19-Jun-2026 08:25:23.797 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent The Apache Tomcat Native library which allows using OpenSSL was not found on the java.library.path: [C:\Program Files\Eclipse Adoptium\jdk-8.0.492.9-hotspot\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:/Users/arush/.gemini/antigravity-ide/bin;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Program Files\nodejs\;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Git\cmd;C:\MinGW\bin;C:\Users\arush\AppData\Local\Programs\Python\Python314\Scripts\;C:\Users\arush\AppData\Local\Programs\Python\Python314\;C:\Users\arush\AppData\Local\Programs\Python\Launcher\;C:\Users\arush\scoop\shims;C:\Users\arush\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\arush\AppData\Local\Programs\Python\Python313\;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\arush\AppData\Local\Microsoft\WindowsApps;C:\Users\arush\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\arush\AppData\Roaming\npm;C:\Program Files\nodejs;C:\Program Files\Tesseract-OCR;C:\Users\arush\AppData\Local\Programs\cursor\resources\app\bin;C:\Users\arush\AppData\Local\Programs\Kiro\bin;C:\MinGW\bin;C:\Users\arush\AppData\Local\Programs\Antigravity IDE\bin;.]
+19-Jun-2026 08:25:24.436 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+19-Jun-2026 08:25:24.474 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [1059] milliseconds
+19-Jun-2026 08:25:24.545 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+19-Jun-2026 08:25:24.553 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.98]
+19-Jun-2026 08:25:24.572 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\docs]
+19-Jun-2026 08:25:25.620 WARNING [main] org.apache.catalina.util.SessionIdGeneratorBase.createSecureRandom Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [621] milliseconds.
+19-Jun-2026 08:25:25.686 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\docs] has finished in [1,111] ms
+19-Jun-2026 08:25:25.686 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\examples]
+19-Jun-2026 08:25:28.098 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\examples] has finished in [2,412] ms
+19-Jun-2026 08:25:28.104 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\HAL]
+19-Jun-2026 08:25:28.244 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\HAL] has finished in [140] ms
+19-Jun-2026 08:25:28.246 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\host-manager]
+19-Jun-2026 08:25:28.308 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\host-manager] has finished in [62] ms
+19-Jun-2026 08:25:28.310 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\manager]
+19-Jun-2026 08:25:28.365 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\manager] has finished in [57] ms
+19-Jun-2026 08:25:28.365 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\ROOT]
+19-Jun-2026 08:25:28.415 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\ROOT] has finished in [50] ms
+19-Jun-2026 08:25:28.427 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+19-Jun-2026 08:25:28.490 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [4016] milliseconds
+19-Jun-2026 22:44:08.108 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.98
+19-Jun-2026 22:44:08.108 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Dec 5 2024 19:50:29 UTC
+19-Jun-2026 22:44:08.114 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.98.0
+19-Jun-2026 22:44:08.114 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 11
+19-Jun-2026 22:44:08.114 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+19-Jun-2026 22:44:08.114 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+19-Jun-2026 22:44:08.115 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Eclipse Adoptium\jdk-8.0.492.9-hotspot\jre
+19-Jun-2026 22:44:08.115 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           1.8.0_492-b09
+19-Jun-2026 22:44:08.115 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Temurin
+19-Jun-2026 22:44:08.115 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         C:\HAL Internship\tomcat
+19-Jun-2026 22:44:08.115 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         C:\HAL Internship\tomcat
+19-Jun-2026 22:44:08.120 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=c:\HAL Internship\tomcat\conf\logging.properties
+19-Jun-2026 22:44:08.120 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+19-Jun-2026 22:44:08.120 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djdk.tls.ephemeralDHKeySize=2048
+19-Jun-2026 22:44:08.120 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.protocol.handler.pkgs=org.apache.catalina.webresources
+19-Jun-2026 22:44:08.120 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dignore.endorsed.dirs=
+19-Jun-2026 22:44:08.120 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=c:\HAL Internship\tomcat
+19-Jun-2026 22:44:08.120 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=c:\HAL Internship\tomcat
+19-Jun-2026 22:44:08.120 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=c:\HAL Internship\tomcat\temp
+19-Jun-2026 22:44:08.132 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent The Apache Tomcat Native library which allows using OpenSSL was not found on the java.library.path: [C:\Program Files\Eclipse Adoptium\jdk-8.0.492.9-hotspot\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:/Users/arush/.gemini/antigravity-ide/bin;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Program Files\nodejs\;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Git\cmd;C:\MinGW\bin;C:\Users\arush\AppData\Local\Programs\Python\Python314\Scripts\;C:\Users\arush\AppData\Local\Programs\Python\Python314\;C:\Users\arush\AppData\Local\Programs\Python\Launcher\;C:\Users\arush\scoop\shims;C:\Users\arush\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\arush\AppData\Local\Programs\Python\Python313\;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\arush\AppData\Local\Microsoft\WindowsApps;C:\Users\arush\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\arush\AppData\Roaming\npm;C:\Program Files\nodejs;C:\Program Files\Tesseract-OCR;C:\Users\arush\AppData\Local\Programs\cursor\resources\app\bin;C:\Users\arush\AppData\Local\Programs\Kiro\bin;C:\MinGW\bin;C:\Users\arush\AppData\Local\Programs\Antigravity IDE\bin;.]
+19-Jun-2026 22:44:08.512 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+19-Jun-2026 22:44:08.542 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [655] milliseconds
+19-Jun-2026 22:44:08.601 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+19-Jun-2026 22:44:08.602 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.98]
+19-Jun-2026 22:44:08.610 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\docs]
+19-Jun-2026 22:44:09.059 WARNING [main] org.apache.catalina.util.SessionIdGeneratorBase.createSecureRandom Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [215] milliseconds.
+19-Jun-2026 22:44:09.083 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\docs] has finished in [473] ms
+19-Jun-2026 22:44:09.084 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\examples]
+19-Jun-2026 22:44:10.254 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\examples] has finished in [1,170] ms
+19-Jun-2026 22:44:10.254 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\HAL]
+19-Jun-2026 22:44:10.326 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\HAL] has finished in [72] ms
+19-Jun-2026 22:44:10.326 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\host-manager]
+19-Jun-2026 22:44:10.366 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\host-manager] has finished in [40] ms
+19-Jun-2026 22:44:10.367 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\manager]
+19-Jun-2026 22:44:10.398 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\manager] has finished in [32] ms
+19-Jun-2026 22:44:10.400 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\ROOT]
+19-Jun-2026 22:44:10.420 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\ROOT] has finished in [22] ms
+19-Jun-2026 22:44:10.426 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+19-Jun-2026 22:44:10.444 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [1895] milliseconds
+19-Jun-2026 22:49:28.653 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.98
+19-Jun-2026 22:49:28.657 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Dec 5 2024 19:50:29 UTC
+19-Jun-2026 22:49:28.660 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.98.0
+19-Jun-2026 22:49:28.660 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 11
+19-Jun-2026 22:49:28.660 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+19-Jun-2026 22:49:28.660 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+19-Jun-2026 22:49:28.660 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Eclipse Adoptium\jdk-8.0.492.9-hotspot\jre
+19-Jun-2026 22:49:28.660 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           1.8.0_492-b09
+19-Jun-2026 22:49:28.660 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Temurin
+19-Jun-2026 22:49:28.660 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         C:\HAL Internship\tomcat
+19-Jun-2026 22:49:28.660 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         C:\HAL Internship\tomcat
+19-Jun-2026 22:49:28.662 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=c:\HAL Internship\tomcat\conf\logging.properties
+19-Jun-2026 22:49:28.662 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+19-Jun-2026 22:49:28.662 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djdk.tls.ephemeralDHKeySize=2048
+19-Jun-2026 22:49:28.662 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.protocol.handler.pkgs=org.apache.catalina.webresources
+19-Jun-2026 22:49:28.662 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dignore.endorsed.dirs=
+19-Jun-2026 22:49:28.662 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=c:\HAL Internship\tomcat
+19-Jun-2026 22:49:28.662 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=c:\HAL Internship\tomcat
+19-Jun-2026 22:49:28.662 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=c:\HAL Internship\tomcat\temp
+19-Jun-2026 22:49:28.672 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent The Apache Tomcat Native library which allows using OpenSSL was not found on the java.library.path: [C:\Program Files\Eclipse Adoptium\jdk-8.0.492.9-hotspot\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:/Users/arush/.gemini/antigravity-ide/bin;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\ProgramData\chocolatey\bin;C:\Program Files\nodejs\;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Git\cmd;C:\MinGW\bin;C:\Users\arush\AppData\Local\Programs\Python\Python314\Scripts\;C:\Users\arush\AppData\Local\Programs\Python\Python314\;C:\Users\arush\AppData\Local\Programs\Python\Launcher\;C:\Users\arush\scoop\shims;C:\Users\arush\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\arush\AppData\Local\Programs\Python\Python313\;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\arush\AppData\Local\Microsoft\WindowsApps;C:\Users\arush\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\arush\AppData\Roaming\npm;C:\Program Files\nodejs;C:\Program Files\Tesseract-OCR;C:\Users\arush\AppData\Local\Programs\cursor\resources\app\bin;C:\Users\arush\AppData\Local\Programs\Kiro\bin;C:\MinGW\bin;C:\Users\arush\AppData\Local\Programs\Antigravity IDE\bin;.]
+19-Jun-2026 22:49:28.953 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+19-Jun-2026 22:49:28.980 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [501] milliseconds
+19-Jun-2026 22:49:29.017 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+19-Jun-2026 22:49:29.018 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.98]
+19-Jun-2026 22:49:29.029 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\docs]
+19-Jun-2026 22:49:29.402 WARNING [main] org.apache.catalina.util.SessionIdGeneratorBase.createSecureRandom Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took [178] milliseconds.
+19-Jun-2026 22:49:29.425 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\docs] has finished in [396] ms
+19-Jun-2026 22:49:29.426 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\examples]
+19-Jun-2026 22:49:29.820 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\examples] has finished in [395] ms
+19-Jun-2026 22:49:29.821 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\HAL]
+19-Jun-2026 22:49:29.886 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\HAL] has finished in [65] ms
+19-Jun-2026 22:49:29.892 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\host-manager]
+19-Jun-2026 22:49:29.923 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\host-manager] has finished in [37] ms
+19-Jun-2026 22:49:29.925 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\manager]
+19-Jun-2026 22:49:29.952 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\manager] has finished in [26] ms
+19-Jun-2026 22:49:29.953 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory [C:\HAL Internship\tomcat\webapps\ROOT]
+19-Jun-2026 22:49:29.975 INFO [main] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory [C:\HAL Internship\tomcat\webapps\ROOT] has finished in [22] ms
+19-Jun-2026 22:49:29.981 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+19-Jun-2026 22:49:29.993 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [1012] milliseconds

@@ -47,18 +47,35 @@ public class SeniorityServlet extends HttpServlet {
             response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 
             PrintWriter writer = response.getWriter();
-            writer.println("Rank,Employee ID,Employee Name,Grade,Grade 10 (General Manager),Grade 9 (Additional General Manager),Grade 8 (Deputy General Manager),Grade 7 (Chief Manager),Grade 6 (Senior Manager),Grade 5 (Manager),Grade 4 (Deputy Manager),Grade 3 (Assistant Manager),Grade 2 (Engineer / Officer),Grade 1 (Trainee / Assistant Engineer),Date of Joining,Date of Birth,Retirement Date,Department,Designation");
+            
+            // Output the exact 30 CSV columns matching the 21 logical columns with 10 sub-grades
+            writer.println("Sl No,Div/Office,Complex,PB No,Name (S/Shri),Discipline,Present Designation,Present Grade,Gender,Ex DT/MT,Ex Servicemen,PHP,SC/ST/OBC/Gen,DOB,Super Annuation,Date of Joining,Date of Absorption,Date of seniority in present grade,Grade I,Grade II,Grade III,Grade IV,Grade V,Grade VI,Grade VII,Grade VIII,Grade IX,Grade X,Educational Qualification,Remarks");
 
             if (seniorityList != null) {
                 for (int i = 0; i < seniorityList.size(); i++) {
                     Employee emp = (Employee) seniorityList.get(i);
                     StringBuffer sb = new StringBuffer();
-                    sb.append(emp.getRank()).append(",");
-                    sb.append("\"").append(emp.getEmployeeId()).append("\",");
-                    sb.append("\"").append(emp.getEmployeeName()).append("\",");
-                    sb.append("\"").append(emp.getGrade()).append("\",");
+                    sb.append(i + 1).append(","); // Sl No
+                    sb.append("\"").append(emp.getDivision() != null ? emp.getDivision() : "").append("\","); // Div/Office
+                    sb.append("\"").append(emp.getComplex() != null ? emp.getComplex() : "").append("\","); // Complex
+                    sb.append("\"").append(emp.getEmployeeId() != null ? emp.getEmployeeId() : "").append("\","); // PB No
+                    sb.append("\"S/Shri ").append(emp.getEmployeeName() != null ? emp.getEmployeeName() : "").append("\","); // Name (S/Shri)
+                    sb.append("\"").append(emp.getDiscipline() != null ? emp.getDiscipline() : "").append("\","); // Discipline
+                    sb.append("\"").append(emp.getDesignation() != null ? emp.getDesignation() : "").append("\","); // Present Designation
+                    sb.append("\"").append(emp.getGrade() != null ? emp.getGrade() : "").append("\","); // Present Grade
+                    sb.append("\"").append(emp.getGender() != null ? emp.getGender() : "").append("\","); // Gender
+                    sb.append("\"").append(emp.getExDtMt() != null ? emp.getExDtMt() : "").append("\","); // Ex DT/MT
+                    sb.append("\"").append(emp.getExServicemen() != null ? emp.getExServicemen() : "").append("\","); // Ex Servicemen
+                    sb.append("\"").append(emp.getPhp() != null ? emp.getPhp() : "").append("\","); // PHP
+                    sb.append("\"").append(emp.getCategory() != null ? emp.getCategory() : "").append("\","); // SC/ST/OBC/Gen
+                    sb.append("\"").append(emp.getDateOfBirth() != null ? dateFormat.format(emp.getDateOfBirth()) : "").append("\","); // DOB
+                    sb.append("\"").append(emp.getDateOfRetirement() != null ? dateFormat.format(emp.getDateOfRetirement()) : "N/A").append("\","); // Super Annuation
+                    sb.append("\"").append(emp.getDateOfJoining() != null ? dateFormat.format(emp.getDateOfJoining()) : "").append("\","); // Date of Joining
+                    sb.append("\"").append(emp.getDateOfAbsorption() != null ? dateFormat.format(emp.getDateOfAbsorption()) : "-").append("\","); // Date of Absorption
+                    sb.append("\"").append(emp.getPromotionDate() != null ? dateFormat.format(emp.getPromotionDate()) : "-").append("\","); // Date of seniority in present grade
                     
-                    for (int g = 10; g >= 1; g--) {
+                    // Seniority in all grades (Grade I to X)
+                    for (int g = 1; g <= 10; g++) {
                         java.util.Date pDate = emp.getPromotionDateForGrade("Grade " + g);
                         if (pDate != null) {
                             sb.append("\"").append(dateFormat.format(pDate)).append("\",");
@@ -67,11 +84,8 @@ public class SeniorityServlet extends HttpServlet {
                         }
                     }
                     
-                    sb.append("\"").append(dateFormat.format(emp.getDateOfJoining())).append("\",");
-                    sb.append("\"").append(dateFormat.format(emp.getDateOfBirth())).append("\",");
-                    sb.append("\"").append(emp.getDateOfRetirement() != null ? dateFormat.format(emp.getDateOfRetirement()) : "N/A").append("\",");
-                    sb.append("\"").append(emp.getDepartment()).append("\",");
-                    sb.append("\"").append(emp.getDesignation()).append("\"");
+                    sb.append("\"").append(emp.getEducationalQualification() != null ? emp.getEducationalQualification() : "").append("\","); // Educational Qualification
+                    sb.append("\"").append(emp.getRemarks() != null ? emp.getRemarks() : "").append("\""); // Remarks
                     
                     writer.println(sb.toString());
                 }

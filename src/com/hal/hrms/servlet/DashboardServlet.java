@@ -68,7 +68,6 @@ public class DashboardServlet extends HttpServlet {
         if (adminCount == 0) {
             adminCount = 2; // Default mock administrators for demo
         }
-
         request.setAttribute("totalEmployees", new Integer(totalEmployees));
         request.setAttribute("adminCount", new Integer(adminCount));
 

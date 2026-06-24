@@ -144,7 +144,8 @@ echo [SUCCESS] Deployment completed.
 :: 4. Start Tomcat Server
 echo [3/3] Starting Tomcat Server...
 echo ==================================================
-echo System starting! Automatically launching portal in your browser...
+echo System starting! You can access the portal at:
+echo http://localhost:8080/HAL/
 echo ==================================================
 cd tomcat\bin
 call startup.bat
