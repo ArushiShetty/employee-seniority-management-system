@@ -204,10 +204,33 @@ public class EmployeeDAO {
         inMemoryEmployees = new ArrayList();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         
-        String[] firstNames = {"Amit", "Rohan", "Sanjay", "Karan", "Vijay", "Anand", "Deepak", "Vikram", "Sunil", "Rajesh", "Manoj", "Pradeep", "Ashok", "Suresh", "Ramesh", "Ajay", "Dinesh", "Harish", "Arvind", "Sandeep", "Kunal", "Varun", "Arjun", "Vinay", "Alok", "Rahul", "Pankaj", "Abhishek", "Gaurav", "Siddharth"};
+        String[] maleFirstNames = {"Amit", "Rohan", "Sanjay", "Karan", "Vijay", "Anand", "Deepak", "Vikram", "Sunil", "Rajesh", "Manoj", "Pradeep", "Ashok", "Suresh", "Ramesh", "Ajay", "Dinesh", "Harish", "Arvind", "Sandeep", "Kunal", "Varun", "Arjun", "Vinay", "Alok", "Rahul", "Pankaj", "Abhishek", "Gaurav", "Siddharth"};
+        String[] femaleFirstNames = {"Arushi", "Priya", "Neha", "Anjali", "Ritu", "Deepa", "Suman", "Sunita", "Geeta", "Kiran", "Meera", "Aarti", "Pooja", "Jyoti", "Shalini", "Rashmi", "Divya", "Swati", "Kavita", "Aditi", "Anita", "Preeti", "Mamta", "Radha", "Rekha", "Uma", "Shanti", "Lata", "Asha", "Sita"};
         String[] lastNames = {"Patil", "Nair", "Joshi", "Iyer", "Rao", "Reddy", "Mehta", "Gowda", "Mishra", "Gupta", "Sen", "Bose", "Das", "Roy", "Sharma", "Singh", "Prasad", "Verma", "Pillai", "Kulkarni", "Choudhury", "Banerjee", "Chatterjee", "Dubey", "Dwivedi", "Tripathi", "Pandey"};
         
-        String[] divisions = {"OVERHAUL", "AIRCRAFT", "ENGINE", "HELICOPTER", "AVIONICS", "ACCESSORIES", "TRANSPORT", "MCMRDC", "AERDC"};
+        String[] divisions = {
+            "Aircraft Division - Bengaluru",
+            "Engine Division - Bengaluru",
+            "Overhaul Division - Bengaluru",
+            "Foundry & Forge Division - Bengaluru",
+            "Aerospace Division - Bengaluru",
+            "IMGT Division (Industrial, Marine and Gas Turbine) - Bengaluru",
+            "LCA-Tejas Division - Bengaluru",
+            "Helicopter Division - Bengaluru",
+            "Helicopter MRO Division - Bengaluru",
+            "Aerospace Composites Division - Bengaluru",
+            "Helicopter Division - Tumakuru",
+            "Barrackpore Division - Barrackpore",
+            "Aircraft Manufacturing Division - Nashik",
+            "Aircraft Overhaul Division - Nashik",
+            "Engine Division - Koraput",
+            "Sukhoi Engine Division - Koraput",
+            "TAD-Kanpur Division (Transport Aircraft) - Kanpur",
+            "Accessories Division - Lucknow",
+            "Avionics Division - Hyderabad",
+            "Avionics Division - Korwa",
+            "Kasaragod Division - Kasaragod"
+        };
         String[] disciplines = {"Technical", "HR", "Finance", "IT", "Materials Management", "Legal", "Security", "PR"};
         String[] qualifications = {"BE (Aero)", "B.Tech (Mech)", "BE (ECE)", "B.Tech (CS)", "MBA (HR)", "CA", "ICWA", "LLB", "M.Tech", "PhD"};
         
@@ -220,8 +243,11 @@ public class EmployeeDAO {
                     int empIdInt = 100000 + (g * 1000) + k;
                     String empIdStr = String.valueOf(empIdInt);
                     
-                    // Dynamic name selection
-                    String firstName = firstNames[(g * k + k) % firstNames.length];
+                    // Gender selection first, then gender-appropriate name
+                    String gender = (k % 4 == 0) ? "Female" : "Male";
+                    String firstName = "Female".equals(gender)
+                        ? femaleFirstNames[(g * k + k) % femaleFirstNames.length]
+                        : maleFirstNames[(g * k + k) % maleFirstNames.length];
                     String lastName = lastNames[(g * k + g) % lastNames.length];
                     String fullName = firstName + " " + lastName;
                     
@@ -286,9 +312,6 @@ public class EmployeeDAO {
                     // Caste Category
                     String[] categories = {"Gen", "Gen", "OBC", "OBC", "SC", "ST"};
                     String category = categories[(g * k) % categories.length];
-                    
-                    // Gender
-                    String gender = (k % 4 == 0) ? "Female" : "Male";
                     
                     // Educational Qualification
                     String qual = qualifications[(g + k) % qualifications.length];
@@ -359,11 +382,238 @@ public class EmployeeDAO {
                     inMemoryEmployees.add(emp);
                 }
             }
-            System.out.println("Java In-Memory Cache initialized with 1,000 detailed records.");
+
+            // Inject 6 Specific Seniority Rule Verification Employees in Grade 5
+            injectSeniorityTestCases(sdf);
+
+            System.out.println("Java In-Memory Cache initialized with 1,006 detailed records.");
         } catch (Exception e) {
             System.err.println("Error parsing demo dates in EmployeeDAO:");
             e.printStackTrace();
         }
+    }
+
+    private void injectSeniorityTestCases(SimpleDateFormat sdf) throws Exception {
+        // Expected rank order: C -> D -> E -> F -> A -> B
+        
+        // Baseline employee A (ID 900001)
+        Employee empA = new Employee();
+        empA.setEmployeeId("900001");
+        empA.setEmployeeName("RuleTwo A");
+        empA.setGrade("Grade 5");
+        empA.setEmpLevel("Level 1");
+        empA.setPromotionDate(sdf.parse("2024-07-01"));
+        empA.setDateOfJoining(sdf.parse("2015-07-01"));
+        empA.setDateOfBirth(sdf.parse("1985-01-01"));
+        empA.setDateOfAbsorption(sdf.parse("2015-07-01"));
+        empA.setDepartment("Technical Dept");
+        empA.setDesignation("Senior Manager (Technical)");
+        empA.setDivision("Aircraft Division - Bengaluru");
+        empA.setComplex("");
+        empA.setDiscipline("Technical");
+        empA.setGender("Male");
+        empA.setExDtMt("NA");
+        empA.setExServicemen("N");
+        empA.setPhp("N");
+        empA.setCategory("Gen");
+        empA.setEducationalQualification("BE (Aero)");
+        empA.setRemarks("Seniority Test Baseline A");
+        
+        List historyA = new ArrayList();
+        for (int pg = 1; pg <= 5; pg++) {
+            Promotion p = new Promotion();
+            p.setEmployeeId("900001");
+            p.setGrade("Grade " + pg);
+            p.setPromotionDate(sdf.parse((pg <= 2 ? 2015 : pg == 3 ? 2018 : pg == 4 ? 2021 : 2024) + "-07-01"));
+            p.setDesignation(Employee.getDesignationForGrade("Grade " + pg) + " (Technical)");
+            p.setIsPrimary(pg == 5 ? 1 : 0);
+            historyA.add(p);
+        }
+        empA.setHistoryList(historyA);
+        inMemoryEmployees.add(empA);
+
+        // Employee B (Rule 2: promoted later than A)
+        Employee empB = new Employee();
+        empB.setEmployeeId("900002");
+        empB.setEmployeeName("RuleTwo B");
+        empB.setGrade("Grade 5");
+        empB.setEmpLevel("Level 1");
+        empB.setPromotionDate(sdf.parse("2024-08-01")); // Rule 2 junior
+        empB.setDateOfJoining(sdf.parse("2015-07-01"));
+        empB.setDateOfBirth(sdf.parse("1985-01-01"));
+        empB.setDateOfAbsorption(sdf.parse("2015-07-01"));
+        empB.setDepartment("Technical Dept");
+        empB.setDesignation("Senior Manager (Technical)");
+        empB.setDivision("Aircraft Division - Bengaluru");
+        empB.setComplex("");
+        empB.setDiscipline("Technical");
+        empB.setGender("Male");
+        empB.setExDtMt("NA");
+        empB.setExServicemen("N");
+        empB.setPhp("N");
+        empB.setCategory("Gen");
+        empB.setEducationalQualification("BE (Aero)");
+        empB.setRemarks("Rule 2: Promoted Later (Junior to A)");
+        
+        List historyB = new ArrayList();
+        for (int pg = 1; pg <= 5; pg++) {
+            Promotion p = new Promotion();
+            p.setEmployeeId("900002");
+            p.setGrade("Grade " + pg);
+            p.setPromotionDate(sdf.parse((pg <= 2 ? 2015 : pg == 3 ? 2018 : pg == 4 ? 2021 : 2024) + (pg == 5 ? "-08-01" : "-07-01")));
+            p.setDesignation(Employee.getDesignationForGrade("Grade " + pg) + " (Technical)");
+            p.setIsPrimary(pg == 5 ? 1 : 0);
+            historyB.add(p);
+        }
+        empB.setHistoryList(historyB);
+        inMemoryEmployees.add(empB);
+
+        // Employee C (Rule 3: promoted to Grade 4 earlier than A)
+        Employee empC = new Employee();
+        empC.setEmployeeId("900003");
+        empC.setEmployeeName("RuleThree C");
+        empC.setGrade("Grade 5");
+        empC.setEmpLevel("Level 1");
+        empC.setPromotionDate(sdf.parse("2024-07-01"));
+        empC.setDateOfJoining(sdf.parse("2015-07-01"));
+        empC.setDateOfBirth(sdf.parse("1983-01-01"));
+        empC.setDateOfAbsorption(sdf.parse("2015-07-01"));
+        empC.setDepartment("Technical Dept");
+        empC.setDesignation("Senior Manager (Technical)");
+        empC.setDivision("Aircraft Division - Bengaluru");
+        empC.setComplex("");
+        empC.setDiscipline("Technical");
+        empC.setGender("Male");
+        empC.setExDtMt("NA");
+        empC.setExServicemen("N");
+        empC.setPhp("N");
+        empC.setCategory("Gen");
+        empC.setEducationalQualification("BE (Aero)");
+        empC.setRemarks("Rule 3: Prev Grade Promoted Earlier (Senior to A)");
+        
+        List historyC = new ArrayList();
+        for (int pg = 1; pg <= 5; pg++) {
+            Promotion p = new Promotion();
+            p.setEmployeeId("900003");
+            p.setGrade("Grade " + pg);
+            p.setPromotionDate(sdf.parse((pg <= 2 ? 2015 : pg == 3 ? 2018 : pg == 4 ? 2021 : 2024) + "-07-01"));
+            if (pg == 4) {
+                p.setPromotionDate(sdf.parse("2021-06-01")); // Rule 3 senior (June vs July)
+            }
+            p.setDesignation(Employee.getDesignationForGrade("Grade " + pg) + " (Technical)");
+            p.setIsPrimary(pg == 5 ? 1 : 0);
+            historyC.add(p);
+        }
+        empC.setHistoryList(historyC);
+        inMemoryEmployees.add(empC);
+
+        // Employee D (Rule 5: DOJ earlier than A)
+        Employee empD = new Employee();
+        empD.setEmployeeId("900004");
+        empD.setEmployeeName("RuleFive D");
+        empD.setGrade("Grade 5");
+        empD.setEmpLevel("Level 1");
+        empD.setPromotionDate(sdf.parse("2024-07-01"));
+        empD.setDateOfJoining(sdf.parse("2015-06-01")); // Rule 5 senior (June vs July)
+        empD.setDateOfBirth(sdf.parse("1983-06-01"));
+        empD.setDateOfAbsorption(sdf.parse("2015-06-01"));
+        empD.setDepartment("Technical Dept");
+        empD.setDesignation("Senior Manager (Technical)");
+        empD.setDivision("Aircraft Division - Bengaluru");
+        empD.setComplex("");
+        empD.setDiscipline("Technical");
+        empD.setGender("Male");
+        empD.setExDtMt("NA");
+        empD.setExServicemen("N");
+        empD.setPhp("N");
+        empD.setCategory("Gen");
+        empD.setEducationalQualification("BE (Aero)");
+        empD.setRemarks("Rule 5: Joined HAL Earlier (Senior to A)");
+        
+        List historyD = new ArrayList();
+        for (int pg = 1; pg <= 5; pg++) {
+            Promotion p = new Promotion();
+            p.setEmployeeId("900004");
+            p.setGrade("Grade " + pg);
+            p.setPromotionDate(sdf.parse((pg <= 2 ? "2015-06-01" : pg == 3 ? "2018-07-01" : pg == 4 ? "2021-07-01" : "2024-07-01")));
+            p.setDesignation(Employee.getDesignationForGrade("Grade " + pg) + " (Technical)");
+            p.setIsPrimary(pg == 5 ? 1 : 0);
+            historyD.add(p);
+        }
+        empD.setHistoryList(historyD);
+        inMemoryEmployees.add(empD);
+
+        // Employee E (Rule 6: DOB earlier/older than A)
+        Employee empE = new Employee();
+        empE.setEmployeeId("900005");
+        empE.setEmployeeName("RuleSix E");
+        empE.setGrade("Grade 5");
+        empE.setEmpLevel("Level 1");
+        empE.setPromotionDate(sdf.parse("2024-07-01"));
+        empE.setDateOfJoining(sdf.parse("2015-07-01"));
+        empE.setDateOfBirth(sdf.parse("1984-12-01")); // Rule 6 senior (Older)
+        empE.setDateOfAbsorption(sdf.parse("2015-07-01"));
+        empE.setDepartment("Technical Dept");
+        empE.setDesignation("Senior Manager (Technical)");
+        empE.setDivision("Aircraft Division - Bengaluru");
+        empE.setComplex("");
+        empE.setDiscipline("Technical");
+        empE.setGender("Male");
+        empE.setExDtMt("NA");
+        empE.setExServicemen("N");
+        empE.setPhp("N");
+        empE.setCategory("Gen");
+        empE.setEducationalQualification("BE (Aero)");
+        empE.setRemarks("Rule 6: Older by Birth (Senior to A)");
+        
+        List historyE = new ArrayList();
+        for (int pg = 1; pg <= 5; pg++) {
+            Promotion p = new Promotion();
+            p.setEmployeeId("900005");
+            p.setGrade("Grade " + pg);
+            p.setPromotionDate(sdf.parse((pg <= 2 ? 2015 : pg == 3 ? 2018 : pg == 4 ? 2021 : 2024) + "-07-01"));
+            p.setDesignation(Employee.getDesignationForGrade("Grade " + pg) + " (Technical)");
+            p.setIsPrimary(pg == 5 ? 1 : 0);
+            historyE.add(p);
+        }
+        empE.setHistoryList(historyE);
+        inMemoryEmployees.add(empE);
+
+        // Employee F (Rule 7: Employee ID lower than A)
+        Employee empF = new Employee();
+        empF.setEmployeeId("900000"); // Rule 7 senior (900000 vs 900001)
+        empF.setEmployeeName("RuleSeven F");
+        empF.setGrade("Grade 5");
+        empF.setEmpLevel("Level 1");
+        empF.setPromotionDate(sdf.parse("2024-07-01"));
+        empF.setDateOfJoining(sdf.parse("2015-07-01"));
+        empF.setDateOfBirth(sdf.parse("1985-01-01"));
+        empF.setDateOfAbsorption(sdf.parse("2015-07-01"));
+        empF.setDepartment("Technical Dept");
+        empF.setDesignation("Senior Manager (Technical)");
+        empF.setDivision("Aircraft Division - Bengaluru");
+        empF.setComplex("");
+        empF.setDiscipline("Technical");
+        empF.setGender("Male");
+        empF.setExDtMt("NA");
+        empF.setExServicemen("N");
+        empF.setPhp("N");
+        empF.setCategory("Gen");
+        empF.setEducationalQualification("BE (Aero)");
+        empF.setRemarks("Rule 7: Lower PB No Tie-breaker (Senior to A)");
+        
+        List historyF = new ArrayList();
+        for (int pg = 1; pg <= 5; pg++) {
+            Promotion p = new Promotion();
+            p.setEmployeeId("900000");
+            p.setGrade("Grade " + pg);
+            p.setPromotionDate(sdf.parse((pg <= 2 ? 2015 : pg == 3 ? 2018 : pg == 4 ? 2021 : 2024) + "-07-01"));
+            p.setDesignation(Employee.getDesignationForGrade("Grade " + pg) + " (Technical)");
+            p.setIsPrimary(pg == 5 ? 1 : 0);
+            historyF.add(p);
+        }
+        empF.setHistoryList(historyF);
+        inMemoryEmployees.add(empF);
     }
 
     /**

@@ -5,6 +5,16 @@ echo ==================================================
 echo HAL Seniority Management System - Startup Script
 echo ==================================================
 
+:: Free port 8080 and 8005 if occupied
+echo [0/3] Ensuring ports 8080 and 8005 are free...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8080') do (
+    taskkill /f /pid %%a >nul 2>nul
+)
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr :8005') do (
+    taskkill /f /pid %%a >nul 2>nul
+)
+
+
 :: 1. Attempt to detect Java
 set "DETECTED_JAVA_HOME="
 
@@ -101,29 +111,29 @@ if defined DETECTED_JAVA_HOME (
 :: 2. Compile Java classes (if javac is available)
 if defined JAVAC_EXE (
     echo [1/3] Compiling Java classes...
-    if not exist "WebContent\WEB-INF\classes" mkdir "WebContent\WEB-INF\classes"
-    if exist java_sources.txt del java_sources.txt
+    if not exist "%~dp0WebContent\WEB-INF\classes" mkdir "%~dp0WebContent\WEB-INF\classes"
+    if exist "%~dp0java_sources.txt" del "%~dp0java_sources.txt" >nul 2>nul
     
     rem Generate java_sources.txt with forward slashes and quotes
-    for /R src %%f in (*.java) do (
+    for /R "%~dp0src" %%f in (*.java) do (
         set "filepath=%%f"
         set "filepath=!filepath:\=/!"
-        echo "!filepath!" >> java_sources.txt
+        echo "!filepath!" >> "%~dp0java_sources.txt"
     )
     
-    "!JAVAC_EXE!" !COMPILER_FLAGS! -d WebContent\WEB-INF\classes -classpath "tomcat\lib\servlet-api.jar" @java_sources.txt
+    "!JAVAC_EXE!" !COMPILER_FLAGS! -d "%~dp0WebContent\WEB-INF\classes" -classpath "%~dp0tomcat\lib\servlet-api.jar" @"%~dp0java_sources.txt"
     
     if errorlevel 1 (
         echo [ERROR] Compilation failed. Please check errors above.
-        if exist java_sources.txt del java_sources.txt
+        if exist "%~dp0java_sources.txt" del "%~dp0java_sources.txt" >nul 2>nul
         pause
         exit /b 1
     )
-    if exist java_sources.txt del java_sources.txt
+    if exist "%~dp0java_sources.txt" del "%~dp0java_sources.txt" >nul 2>nul
     echo [SUCCESS] Compilation successful.
 ) else (
     rem Check if classes exist
-    if exist "WebContent\WEB-INF\classes\com\hal\hrms\servlet\LoginServlet.class" (
+    if exist "%~dp0WebContent\WEB-INF\classes\com\hal\hrms\servlet\LoginServlet.class" (
         echo [INFO] JDK compiler javac not found.
         echo [INFO] Running with pre-compiled classes from your laptop.
     ) else (
@@ -136,9 +146,11 @@ if defined JAVAC_EXE (
 
 :: 3. Deploy/Copy WebContent to Tomcat webapps/HAL
 echo [2/3] Deploying application files to Tomcat...
-if exist "tomcat\webapps\HAL" rmdir /s /q "tomcat\webapps\HAL"
-mkdir "tomcat\webapps\HAL"
-xcopy /s /e /y /q WebContent\* tomcat\webapps\HAL\ > nul
+if not exist "%~dp0WebContent\WEB-INF\classes" mkdir "%~dp0WebContent\WEB-INF\classes"
+copy "%~dp0src\db.properties" "%~dp0WebContent\WEB-INF\classes" > nul
+if exist "%~dp0tomcat\webapps\HAL" rmdir /s /q "%~dp0tomcat\webapps\HAL"
+mkdir "%~dp0tomcat\webapps\HAL"
+robocopy "%~dp0WebContent" "%~dp0tomcat\webapps\HAL" /e /r:0 /w:0 /njh /njs /ndl /nc /ns > nul
 echo [SUCCESS] Deployment completed.
 
 :: 4. Start Tomcat Server

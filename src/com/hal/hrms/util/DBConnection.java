@@ -86,6 +86,7 @@ public class DBConnection {
             e.printStackTrace();
             throw new SQLException("JDBC Driver ClassNotFound: " + e.getMessage());
         }
+        DriverManager.setLoginTimeout(3);
         return DriverManager.getConnection(url, user, pass);
     }
 }

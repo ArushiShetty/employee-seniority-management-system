@@ -112,3 +112,28 @@ If the web browser does not pop up automatically after starting the script, do t
 ---
 
 * **Note on Config Edits**: If you make configuration edits directly on the running server, you can edit the file at **`tomcat/webapps/HAL/WEB-INF/classes/db.properties`** and restart the server (using `shutdown` and `startup` scripts in `tomcat/bin`) to see changes instantly without rebuilding.
+
+---
+
+## STEP 7: Import Tables & Seed Data using PL/SQL Developer
+
+If the HAL Oracle database does not have the seniority system tables yet, you can import them directly using **PL/SQL Developer**:
+
+1. **Log in**: Open PL/SQL Developer and log in using the credentials obtained in STEP 1.
+2. **Open the SQL Script**:
+   - In the top menu bar, click **File -> Open -> SQL Script...**
+   - Browse to your project folder: `c:\HAL Internship`
+   - Select and open the file **`schema.sql`**.
+3. **Execute the Script**:
+   - In the SQL window containing the `schema.sql` commands, press the **`F8`** key on your keyboard (or click the green **Execute** triangle button on the toolbar).
+   - This script will run in their PL/SQL backend and perform the following automatically:
+     - Create the master employee table (`MST_EMPLOYEES`).
+     - Create the promotions history table (`TRN_PROMOTIONS`).
+     - Create the promotions auto-increment sequence (`SEQ_PROMOTIONS`).
+     - Insert all seed data for divisions, classifications, categories, and test tie-breaker records.
+     - Perform a `COMMIT` to save all entries to the database tables.
+4. **Verify the Tables**:
+   - In the left-hand Objects Browser, expand the **Tables** folder.
+   - Right-click and choose **Refresh**.
+   - Verify that **`MST_EMPLOYEES`** and **`TRN_PROMOTIONS`** now appear in the list.
+

@@ -63,16 +63,18 @@ public class TestSeniority {
         System.out.println("-----+---------+----------------------+----------+---------+-------------+-------------+------------");
         for (int i = 0; i < list.size(); i++) {
             Employee emp = (Employee) list.get(i);
-            System.out.println(
-                padRight(String.valueOf(emp.getRank()), 4) + " | " +
-                padRight(emp.getEmployeeId(), 7) + " | " +
-                padRight(emp.getEmployeeName(), 20) + " | " +
-                padRight(emp.getGrade(), 8) + " | " +
-                padRight(emp.getEmpLevel(), 7) + " | " +
-                padRight(sdf.format(emp.getPromotionDate()), 11) + " | " +
-                padRight(sdf.format(emp.getDateOfJoining()), 11) + " | " +
-                sdf.format(emp.getDateOfBirth())
-            );
+            if (emp.getEmployeeId().startsWith("9000")) {
+                System.out.println(
+                    padRight(String.valueOf(emp.getRank()), 4) + " | " +
+                    padRight(emp.getEmployeeId(), 7) + " | " +
+                    padRight(emp.getEmployeeName(), 20) + " | " +
+                    padRight(emp.getGrade(), 8) + " | " +
+                    padRight(emp.getEmpLevel(), 7) + " | " +
+                    padRight(sdf.format(emp.getPromotionDate()), 11) + " | " +
+                    padRight(sdf.format(emp.getDateOfJoining()), 11) + " | " +
+                    sdf.format(emp.getDateOfBirth())
+                );
+            }
         }
     }
 

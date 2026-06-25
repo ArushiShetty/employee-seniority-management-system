@@ -611,7 +611,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Grade</label>
-                                <select id="formGrade" class="form-control">
+                                <select id="formGrade" class="form-control" onchange="updateFormPromotionDateFields()">
                                     <option value="Grade 1">Grade 1</option>
                                     <option value="Grade 2">Grade 2</option>
                                     <option value="Grade 3">Grade 3</option>
@@ -642,9 +642,8 @@
                                 <label class="form-label">Date of Joining</label>
                                 <input type="date" id="formDOJ" class="form-control">
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Current Grade Promotion Date</label>
-                                <input type="date" id="formPromotionDate" class="form-control">
+                            <div id="dynamicPromotionDatesContainer" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 0.5rem;">
+                                <!-- Dynamic promotion date fields will be rendered here -->
                             </div>
                         </div>
 
@@ -807,7 +806,7 @@
                 dateOfAbsorption: "1995-07-01",
                 department: "LCA Division Dept",
                 designation: "Additional General Manager (Technical)",
-                division: "LCA",
+                division: "LCA-Tejas Division - Bengaluru",
                 complex: "",
                 discipline: "Technical",
                 gender: "Male",
@@ -833,7 +832,7 @@
                 dateOfAbsorption: "1992-06-01",
                 department: "Technical Dept",
                 designation: "General Manager (Technical)",
-                division: "OVERHAUL",
+                division: "Overhaul Division - Bengaluru",
                 complex: "",
                 discipline: "Technical",
                 gender: "Male",
@@ -859,7 +858,7 @@
                 dateOfAbsorption: "2006-01-01",
                 department: "Services Dept",
                 designation: "Chief Manager (Services)",
-                division: "OVERHAUL",
+                division: "Overhaul Division - Bengaluru",
                 complex: "",
                 discipline: "HR",
                 gender: "Male",
@@ -886,7 +885,7 @@
                 dateOfAbsorption: "2013-12-14",
                 department: "Technical Dept",
                 designation: "Highly Skilled Technician (Technical)",
-                division: "ENGINE",
+                division: "Engine Division - Bengaluru",
                 complex: "",
                 discipline: "Technical",
                 gender: "Male",
@@ -914,7 +913,7 @@
                 dateOfAbsorption: "2013-12-17",
                 department: "Technical Dept",
                 designation: "Highly Skilled Technician (Technical)",
-                division: "ENGINE",
+                division: "Engine Division - Bengaluru",
                 complex: "",
                 discipline: "Technical",
                 gender: "Male",
@@ -942,7 +941,7 @@
                 dateOfAbsorption: "2013-12-26",
                 department: "Technical Dept",
                 designation: "Highly Skilled Technician (Technical)",
-                division: "ENGINE",
+                division: "Engine Division - Bengaluru",
                 complex: "",
                 discipline: "Technical",
                 gender: "Male",
@@ -961,20 +960,47 @@
             }
         ];
 
-        // Programmatically generate 5 employees for every grade (Grade 1 to 10) to match dynamic app
+        // Programmatically generate 10 employees for every grade (Grade 1 to 10) to match dynamic app
         (function() {
-            var firstNames = ["Amit", "Rohan", "Sanjay", "Karan", "Vijay", "Anand", "Deepak", "Vikram", "Sunil", "Rajesh", "Manoj", "Pradeep", "Ashok", "Suresh", "Ramesh", "Ajay", "Dinesh", "Harish", "Arvind", "Sandeep"];
+            var maleFirstNames = ["Amit", "Rohan", "Sanjay", "Karan", "Vijay", "Anand", "Deepak", "Vikram", "Sunil", "Rajesh", "Manoj", "Pradeep", "Ashok", "Suresh", "Ramesh", "Ajay", "Dinesh", "Harish", "Arvind", "Sandeep", "Aarav", "Alok", "Prashant", "Nikhil", "Vikrant", "Gaurav", "Siddharth", "Abhishek", "Rahul", "Pankaj"];
+            var femaleFirstNames = ["Arushi", "Priya", "Neha", "Anjali", "Ritu", "Deepa", "Suman", "Sunita", "Geeta", "Kiran", "Meera", "Aarti", "Pooja", "Jyoti", "Shalini", "Rashmi", "Divya", "Swati", "Kavita", "Aditi", "Anita", "Preeti", "Mamta", "Radha", "Rekha", "Uma", "Shanti", "Lata", "Asha", "Sita"];
             var lastNames = ["Patil", "Nair", "Joshi", "Iyer", "Rao", "Reddy", "Mehta", "Gowda", "Mishra", "Gupta", "Sen", "Bose", "Das", "Roy", "Sharma", "Singh", "Prasad", "Verma"];
-            var divisions = ["OVERHAUL", "AIRCRAFT", "ENGINE", "HELICOPTER", "AVIONICS", "ACCESSORIES", "TRANSPORT", "MCMRDC", "AERDC"];
+            
+            var divisions = [
+                "Aircraft Division - Bengaluru",
+                "Engine Division - Bengaluru",
+                "Overhaul Division - Bengaluru",
+                "Foundry & Forge Division - Bengaluru",
+                "Aerospace Division - Bengaluru",
+                "IMGT Division (Industrial, Marine and Gas Turbine) - Bengaluru",
+                "LCA-Tejas Division - Bengaluru",
+                "Helicopter Division - Bengaluru",
+                "Helicopter MRO Division - Bengaluru",
+                "Aerospace Composites Division - Bengaluru",
+                "Helicopter Division - Tumakuru",
+                "Barrackpore Division - Barrackpore",
+                "Aircraft Manufacturing Division - Nashik",
+                "Aircraft Overhaul Division - Nashik",
+                "Engine Division - Koraput",
+                "Sukhoi Engine Division - Koraput",
+                "TAD-Kanpur Division (Transport Aircraft) - Kanpur",
+                "Accessories Division - Lucknow",
+                "Avionics Division - Hyderabad",
+                "Avionics Division - Korwa",
+                "Kasaragod Division - Kasaragod"
+            ];
             var disciplines = ["Technical", "HR", "Finance", "IT", "Materials Management", "Legal", "Security", "PR"];
             var qualifications = ["BE (Aero)", "B.Tech (Mech)", "BE (ECE)", "B.Tech (CS)", "MBA (HR)", "CA", "ICWA", "LLB", "M.Tech", "PhD"];
             
             for (var g = 1; g <= 10; g++) {
-                for (var k = 0; k < 5; k++) {
+                for (var k = 0; k < 10; k++) {
                     var empIdInt = 120000 + (g * 100) + k;
                     var empIdStr = String(empIdInt);
                     
-                    var firstName = firstNames[(g * k + k) % firstNames.length];
+                    var gender = (k % 3 === 0) ? "Female" : "Male";
+                    var firstName = (gender === "Female")
+                        ? femaleFirstNames[(g * k + k) % femaleFirstNames.length]
+                        : maleFirstNames[(g * k + k) % maleFirstNames.length];
                     var lastName = lastNames[(g * k + g) % lastNames.length];
                     var fullName = firstName + " " + lastName;
                     
@@ -1021,7 +1047,6 @@
                     var exServicemen = (k === 0) ? "Y" : "N";
                     var php = (k === 1) ? "Y" : "N";
                     var category = ["Gen", "OBC", "SC", "ST"][(g * k) % 4];
-                    var gender = (k % 3 === 0) ? "Female" : "Male";
                     var qual = qualifications[(g + k) % qualifications.length];
                     
                     var history = [];
@@ -1063,17 +1088,207 @@
                     });
                 }
             }
+
+            // Inject 6 Specific Seniority Rule Verification Employees in Grade 5
+            // Expected rank order: C -> D -> E -> F -> A -> B
+            
+            // Baseline employee A (ID 900001)
+            defaultEmployees.push({
+                employeeId: "900001",
+                employeeName: "RuleTwo A",
+                grade: "Grade 5",
+                empLevel: "Level 1",
+                promotionDate: "2024-07-01",
+                dateOfJoining: "2015-07-01",
+                dateOfBirth: "1985-01-01",
+                dateOfAbsorption: "2015-07-01",
+                department: "Technical Dept",
+                designation: "Senior Manager (Technical)",
+                division: "Aircraft Division - Bengaluru",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "NA",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Aero)",
+                remarks: "Seniority Test Baseline A",
+                history: [
+                    { grade: "Grade 1", promoDate: "2015-07-01" },
+                    { grade: "Grade 2", promoDate: "2015-07-01" },
+                    { grade: "Grade 3", promoDate: "2018-07-01" },
+                    { grade: "Grade 4", promoDate: "2021-07-01" },
+                    { grade: "Grade 5", promoDate: "2024-07-01" }
+                ]
+            });
+
+            // Employee B (Rule 2: promoted to Grade 5 later than A)
+            defaultEmployees.push({
+                employeeId: "900002",
+                employeeName: "RuleTwo B",
+                grade: "Grade 5",
+                empLevel: "Level 1",
+                promotionDate: "2024-08-01", // Rule 2 junior
+                dateOfJoining: "2015-07-01",
+                dateOfBirth: "1985-01-01",
+                dateOfAbsorption: "2015-07-01",
+                department: "Technical Dept",
+                designation: "Senior Manager (Technical)",
+                division: "Aircraft Division - Bengaluru",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "NA",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Aero)",
+                remarks: "Rule 2: Promoted Later (Junior to A)",
+                history: [
+                    { grade: "Grade 1", promoDate: "2015-07-01" },
+                    { grade: "Grade 2", promoDate: "2015-07-01" },
+                    { grade: "Grade 3", promoDate: "2018-07-01" },
+                    { grade: "Grade 4", promoDate: "2021-07-01" },
+                    { grade: "Grade 5", promoDate: "2024-08-01" }
+                ]
+            });
+
+            // Employee C (Rule 3: promoted to Grade 4 earlier than A)
+            defaultEmployees.push({
+                employeeId: "900003",
+                employeeName: "RuleThree C",
+                grade: "Grade 5",
+                empLevel: "Level 1",
+                promotionDate: "2024-07-01",
+                dateOfJoining: "2015-07-01",
+                dateOfBirth: "1983-01-01",
+                dateOfAbsorption: "2015-07-01",
+                department: "Technical Dept",
+                designation: "Senior Manager (Technical)",
+                division: "Aircraft Division - Bengaluru",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "NA",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Aero)",
+                remarks: "Rule 3: Prev Grade Promoted Earlier (Senior to A)",
+                history: [
+                    { grade: "Grade 1", promoDate: "2015-07-01" },
+                    { grade: "Grade 2", promoDate: "2015-07-01" },
+                    { grade: "Grade 3", promoDate: "2018-07-01" },
+                    { grade: "Grade 4", promoDate: "2021-06-01" }, // Rule 3 senior (June vs July)
+                    { grade: "Grade 5", promoDate: "2024-07-01" }
+                ]
+            });
+
+            // Employee D (Rule 5: DOJ earlier than A)
+            defaultEmployees.push({
+                employeeId: "900004",
+                employeeName: "RuleFive D",
+                grade: "Grade 5",
+                empLevel: "Level 1",
+                promotionDate: "2024-07-01",
+                dateOfJoining: "2015-06-01", // Rule 5 senior (June vs July)
+                dateOfBirth: "1983-06-01",
+                dateOfAbsorption: "2015-06-01",
+                department: "Technical Dept",
+                designation: "Senior Manager (Technical)",
+                division: "Aircraft Division - Bengaluru",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "NA",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Aero)",
+                remarks: "Rule 5: Joined HAL Earlier (Senior to A)",
+                history: [
+                    { grade: "Grade 1", promoDate: "2015-06-01" },
+                    { grade: "Grade 2", promoDate: "2015-06-01" },
+                    { grade: "Grade 3", promoDate: "2018-07-01" },
+                    { grade: "Grade 4", promoDate: "2021-07-01" },
+                    { grade: "Grade 5", promoDate: "2024-07-01" }
+                ]
+            });
+
+            // Employee E (Rule 6: DOB earlier/older than A)
+            defaultEmployees.push({
+                employeeId: "900005",
+                employeeName: "RuleSix E",
+                grade: "Grade 5",
+                empLevel: "Level 1",
+                promotionDate: "2024-07-01",
+                dateOfJoining: "2015-07-01",
+                dateOfBirth: "1984-12-01", // Rule 6 senior (1984 vs 1985 / Older)
+                dateOfAbsorption: "2015-07-01",
+                department: "Technical Dept",
+                designation: "Senior Manager (Technical)",
+                division: "Aircraft Division - Bengaluru",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "NA",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Aero)",
+                remarks: "Rule 6: Older by Birth (Senior to A)",
+                history: [
+                    { grade: "Grade 1", promoDate: "2015-07-01" },
+                    { grade: "Grade 2", promoDate: "2015-07-01" },
+                    { grade: "Grade 3", promoDate: "2018-07-01" },
+                    { grade: "Grade 4", promoDate: "2021-07-01" },
+                    { grade: "Grade 5", promoDate: "2024-07-01" }
+                ]
+            });
+
+            // Employee F (Rule 7: Employee ID lower than A)
+            defaultEmployees.push({
+                employeeId: "900000", // Rule 7 senior (900000 vs 900001)
+                employeeName: "RuleSeven F",
+                grade: "Grade 5",
+                empLevel: "Level 1",
+                promotionDate: "2024-07-01",
+                dateOfJoining: "2015-07-01",
+                dateOfBirth: "1985-01-01",
+                dateOfAbsorption: "2015-07-01",
+                department: "Technical Dept",
+                designation: "Senior Manager (Technical)",
+                division: "Aircraft Division - Bengaluru",
+                complex: "",
+                discipline: "Technical",
+                gender: "Male",
+                exDtMt: "NA",
+                exServicemen: "N",
+                php: "N",
+                category: "Gen",
+                qualification: "BE (Aero)",
+                remarks: "Rule 7: Lower PB No Tie-breaker (Senior to A)",
+                history: [
+                    { grade: "Grade 1", promoDate: "2015-07-01" },
+                    { grade: "Grade 2", promoDate: "2015-07-01" },
+                    { grade: "Grade 3", promoDate: "2018-07-01" },
+                    { grade: "Grade 4", promoDate: "2021-07-01" },
+                    { grade: "Grade 5", promoDate: "2024-07-01" }
+                ]
+            });
         })();
 
         // Load employees from browser localStorage, or use default seed data if empty
         var employees = null;
         try {
             var rawEmps = localStorage.getItem("hal_employees");
-            // Clear old cache if it does not contain division schema property
-            if (rawEmps && rawEmps.indexOf("division") === -1) {
+            // Clear old cache if it does not contain division schema property, or contains legacy short division names, or old divisions with states
+            if (rawEmps && (rawEmps.indexOf("division") === -1 || rawEmps.indexOf('"division":"OVERHAUL"') !== -1 || rawEmps.indexOf('"division":"LCA"') !== -1 || rawEmps.indexOf(", Karnataka") !== -1)) {
                 localStorage.removeItem("hal_employees");
+                rawEmps = null;
             }
-            employees = JSON.parse(localStorage.getItem("hal_employees"));
+            employees = JSON.parse(rawEmps);
         } catch (e) {
             console.warn("localStorage access is restricted on local file protocol. Using temporary in-memory storage.");
         }
@@ -1115,6 +1330,10 @@
                         existingEmp.dateOfBirth = de.dateOfBirth;
                         needsUpdate = true;
                     }
+                    if (existingEmp.division !== de.division) {
+                        existingEmp.division = de.division;
+                        needsUpdate = true;
+                    }
                     if (needsUpdate) {
                         modified = true;
                     }
@@ -1129,6 +1348,35 @@
 
         var isEditMode = false;
         var editTargetId = "";
+
+        function updateFormPromotionDateFields() {
+            var gradeVal = document.getElementById("formGrade").value;
+            var container = document.getElementById("dynamicPromotionDatesContainer");
+            if (!container) return;
+
+            var maxGrade = 1;
+            if (gradeVal && gradeVal.startsWith("Grade ")) {
+                maxGrade = parseInt(gradeVal.substring(6));
+            }
+            if (isNaN(maxGrade) || maxGrade < 1) maxGrade = 1;
+
+            var html = "";
+            for (var g = 1; g <= maxGrade; g++) {
+                var romanNumerals = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+                var roman = romanNumerals[g] || String(g);
+                var desig = getDesignationForGradeJS("Grade " + g);
+                var labelText = "Promotion Date to Grade " + roman + " (" + desig + ")";
+                if (g === 1) {
+                    labelText = "Date of Joining/Promotion to Grade I (" + desig + ")";
+                }
+                
+                html += '<div class="form-group">' +
+                        '  <label class="form-label">' + labelText + '</label>' +
+                        '  <input type="date" id="formPromoDate_Grade_' + g + '" class="form-control">' +
+                        '</div>';
+            }
+            container.innerHTML = html;
+        }
 
         // 2. Authentication Logic
         function handleLogin() {
@@ -1754,7 +2002,8 @@
             document.getElementById("formLevel").value = "Level 1";
             document.getElementById("formDOB").value = "";
             document.getElementById("formDOJ").value = "";
-            document.getElementById("formPromotionDate").value = "";
+
+            updateFormPromotionDateFields();
 
             switchScreen("formScreen");
             document.getElementById("nav-add").classList.add("active");
@@ -1779,7 +2028,21 @@
             document.getElementById("formLevel").value = emp.empLevel;
             document.getElementById("formDOB").value = emp.dateOfBirth;
             document.getElementById("formDOJ").value = emp.dateOfJoining;
-            document.getElementById("formPromotionDate").value = emp.promotionDate;
+
+            updateFormPromotionDateFields();
+
+            // Populate fields
+            var maxGrade = 1;
+            if (emp.grade && emp.grade.startsWith("Grade ")) {
+                maxGrade = parseInt(emp.grade.substring(6));
+            }
+            for (var g = 1; g <= maxGrade; g++) {
+                var pDate = getPromotionDateForGrade(emp, "Grade " + g);
+                var inputEl = document.getElementById("formPromoDate_Grade_" + g);
+                if (inputEl && pDate) {
+                    inputEl.value = pDate;
+                }
+            }
 
             switchScreen("formScreen");
         }
@@ -1793,10 +2056,18 @@
             var level = document.getElementById("formLevel").value;
             var dob = document.getElementById("formDOB").value;
             var doj = document.getElementById("formDOJ").value;
-            var promo = document.getElementById("formPromotionDate").value;
+
+            var currentGradeNum = 1;
+            if (grade && grade.startsWith("Grade ")) {
+                currentGradeNum = parseInt(grade.substring(6));
+            }
+            if (isNaN(currentGradeNum) || currentGradeNum < 1) currentGradeNum = 1;
+
+            var promoInput = document.getElementById("formPromoDate_Grade_" + currentGradeNum);
+            var promo = promoInput ? promoInput.value : "";
 
             if (empId === "" || empName === "" || dob === "" || doj === "" || promo === "") {
-                alert("Please fill in all required fields!");
+                alert("Please fill in all required fields (including the promotion date for the current grade)!");
                 return;
             }
 
@@ -1814,6 +2085,14 @@
                 return;
             }
 
+            var history = [];
+            for (var g = 1; g <= currentGradeNum; g++) {
+                var pDateVal = document.getElementById("formPromoDate_Grade_" + g).value;
+                if (pDateVal) {
+                    history.push({ grade: "Grade " + g, promoDate: pDateVal });
+                }
+            }
+
             if (isEditMode) {
                 // Update active list
                 var idx = employees.findIndex(function(e) { return e.employeeId === editTargetId; });
@@ -1821,24 +2100,12 @@
                     employees[idx].employeeName = empName;
                     employees[idx].department = dept;
                     employees[idx].designation = desig;
-                    
-                    // If grade changed, push old promotion date into history
-                    if (employees[idx].grade !== grade) {
-                        if (!employees[idx].history) employees[idx].history = [];
-                        // check if already has history for current grade
-                        var hIdx = employees[idx].history.findIndex(function(h) { return h.grade === employees[idx].grade; });
-                        if (hIdx > -1) {
-                            employees[idx].history[hIdx].promoDate = employees[idx].promotionDate;
-                        } else {
-                            employees[idx].history.push({ grade: employees[idx].grade, promoDate: employees[idx].promotionDate });
-                        }
-                    }
-
                     employees[idx].grade = grade;
                     employees[idx].empLevel = level;
                     employees[idx].dateOfBirth = dob;
                     employees[idx].dateOfJoining = doj;
                     employees[idx].promotionDate = promo;
+                    employees[idx].history = history;
                 }
             } else {
                 // Add new
@@ -1859,9 +2126,7 @@
                     dateOfBirth: dob,
                     department: dept,
                     designation: desig,
-                    history: [
-                        { grade: grade, promoDate: promo }
-                    ]
+                    history: history
                 };
                 employees.push(newEmp);
             }

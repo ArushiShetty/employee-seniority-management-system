@@ -236,3 +236,21 @@ For example, if their active employee list is in a table called
   or open the console and type "localStorage.clear()" followed by hitting 
   Enter to refresh the mocked data database.
 
+------------------------------------------------------------------------
+6. OFFLINE INTRANET DEPLOYMENT (HOSTING ON HAL LOCAL LAN E.G. 172.32.11.X)
+------------------------------------------------------------------------
+
+If you want other computers on the offline HAL LAN to access the system:
+1. Find Host IP: Open command prompt (cmd) on the host machine and run 
+   "ipconfig". Find your IPv4 address (e.g., 172.32.11.50).
+2. Open Firewall Port: Allow inbound TCP traffic on port 8080 in Windows 
+   Firewall:
+   - Open Command Prompt as Administrator and run:
+     netsh advfirewall firewall add rule name="Tomcat Web Server" dir=in action=allow protocol=TCP localport=8080
+3. Tomcat Binding: Tomcat binds to all network interfaces (0.0.0.0) by 
+   default, so it automatically listens on your network IP address.
+4. Access the Portal: Other computers on the same network can now open their 
+   browser and navigate to:
+   http://<HOST_IP>:8080/HAL/ (e.g., http://172.32.11.50:8080/HAL/)
+
+

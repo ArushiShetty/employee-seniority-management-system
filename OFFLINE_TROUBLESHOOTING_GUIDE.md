@@ -189,3 +189,60 @@ Here is a list of everything that could go wrong and exactly how to fix it:
     ```bash
     killall -9 java
     ```
+
+---
+
+### PROBLEM 11: Other LAN computers cannot connect (Windows Firewall block)
+* **What it means**: The portal works fine on the host machine (`http://localhost:8080/HAL/`), but other offline computers on the HAL local LAN cannot open the URL.
+* **Symptom**: Browser shows `This site can’t be reached` or `Connection timed out` on other machines.
+* **How to Fix**:
+  1. Open Command Prompt as Administrator on the host machine.
+  2. Run the following command to allow incoming connections on port `8080`:
+     ```cmd
+     netsh advfirewall firewall add rule name="Tomcat Web Server" dir=in action=allow protocol=TCP localport=8080
+     ```
+  3. Ensure both computers are connected to the same LAN subnet (e.g. `172.32.11.x`).
+
+---
+
+### PROBLEM 12: Tomcat starts but immediately shuts down (Port 8005 in use)
+* **What it means**: The shutdown port `8005` (which Tomcat uses to listen for stop commands) is already occupied.
+* **Symptom**: The console window starts, but Tomcat shuts down within a few seconds. The logs in `tomcat/logs/catalina.log` show: `Failed to create server shutdown socket on address [localhost] and port [8005] (Address already in use: JVM_Bind)`.
+* **How to Fix**:
+  - **On Windows**:
+    1. Open command prompt (`cmd`) and run:
+       ```cmd
+       netstat -ano | findstr 8005
+       ```
+    2. Note the PID at the end of the line (e.g. `12450`).
+    3. Run:
+       ```cmd
+       taskkill /F /PID 12450
+       ```
+  - **On Linux**: Run:
+    ```bash
+    fuser -k 8005/tcp
+    ```
+
+---
+
+### PROBLEM 13: "ORA-12154: TNS:could not resolve the connect identifier"
+* **What it means**: The client application (like PL/SQL Developer) or the JDBC connection cannot locate the database service name.
+* **Symptom**: Connection fails with database identifier mapping errors.
+* **How to Fix**:
+  1. Locate the file named `tnsnames.ora` on the HAL machine (usually in `C:\oracle\product\...\client_1\network\admin\tnsnames.ora` or `network/admin/` folder under your Oracle Home).
+  2. Open the file in Notepad and locate the connection block. For example:
+     ```text
+     HALDB =
+       (DESCRIPTION =
+         (ADDRESS_LIST =
+           (ADDRESS = (PROTOCOL = TCP)(HOST = 172.32.11.10)(PORT = 1521))
+         )
+         (CONNECT_DATA =
+           (SERVICE_NAME = HALPROD)
+         )
+       )
+     ```
+  3. Use the exact host (`172.32.11.10`), port (`1521`), and service name (`HALPROD`) details in your `src/db.properties` connection string:
+     `db.url=jdbc:oracle:thin:@172.32.11.10:1521:HALPROD`
+

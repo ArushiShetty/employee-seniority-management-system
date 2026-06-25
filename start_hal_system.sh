@@ -7,8 +7,40 @@ echo "=================================================="
 echo "HAL Seniority Management System - Ubuntu Startup"
 echo "=================================================="
 
+# Free ports 8080 and 8005 if occupied
+echo "[0/3] Ensuring ports 8080 and 8005 are free..."
+for port in 8080 8005; do
+    if command -v lsof >/dev/null 2>&1; then
+        pid=$(lsof -t -i:$port)
+        if [ -n "$pid" ]; then
+            echo "[INFO] Killing process using port $port (PID: $pid)..."
+            kill -9 $pid >/dev/null 2>&1
+        fi
+    elif command -v fuser >/dev/null 2>&1; then
+        echo "[INFO] Killing process using port $port..."
+        fuser -k $port/tcp >/dev/null 2>&1
+    elif command -v ss >/dev/null 2>&1; then
+        pid=$(ss -lptn "sport = :$port" 2>/dev/null | grep -o 'pid=[0-9]*' | cut -d= -f2)
+        if [ -n "$pid" ]; then
+            echo "[INFO] Killing process using port $port (PID: $pid)..."
+            kill -9 $pid >/dev/null 2>&1
+        fi
+    elif command -v netstat >/dev/null 2>&1; then
+        pid=$(netstat -lntp 2>/dev/null | grep ":$port " | awk '{print $7}' | cut -d'/' -f1)
+        if [ -n "$pid" ]; then
+            echo "[INFO] Killing process using port $port (PID: $pid)..."
+            kill -9 $pid >/dev/null 2>&1
+        fi
+    fi
+done
+
 # 1. Detect Java
-if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/javac" ]; then
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -d "$SCRIPT_DIR/jdk" ] && [ -x "$SCRIPT_DIR/jdk/bin/javac" ]; then
+    export JAVA_HOME="$SCRIPT_DIR/jdk"
+    echo "[INFO] Using bundled local JDK: $JAVA_HOME"
+    JAVAC="$JAVA_HOME/bin/javac"
+elif [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/javac" ]; then
     echo "[INFO] Using JAVA_HOME: $JAVA_HOME"
     JAVAC="$JAVA_HOME/bin/javac"
 else

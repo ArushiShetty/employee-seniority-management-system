@@ -220,3 +220,19 @@ For example, if their active employee list is in a table called `EMPLOYEE_MASTER
 ## 5. Troubleshooting Offline Failures
 * **"JDK Compiler Javac Not Found"**: This means Java JDK is not installed on the system, or the script failed to find it. Double check that the Java version installed on the HAL system is at least Java Runtime Environment (JRE) or Java Development Kit (JDK).
 * **Clear Browser Cache**: If you edited code inside `index.html` but do not see it in the browser, press `F12` to open developer tools, right-click the reload button in the browser, and select **"Empty Cache and Hard Reload"**, or open the console and type `localStorage.clear()` followed by hitting Enter to refresh the mocked data database.
+
+---
+
+## 6. Offline Intranet Deployment (Hosting on HAL Local LAN e.g. 172.32.11.x)
+
+If you want other computers on the offline HAL LAN to access the system:
+1. **Find Host IP**: Open command prompt (`cmd`) on the host machine and run `ipconfig`. Look for your IPv4 address (e.g., `172.32.11.50`).
+2. **Open Firewall Port**: Allow inbound TCP traffic on port `8080` in Windows Firewall:
+   - Open Command Prompt as Administrator and run:
+     ```cmd
+     netsh advfirewall firewall add rule name="Tomcat Web Server" dir=in action=allow protocol=TCP localport=8080
+     ```
+3. **Tomcat Binding**: Tomcat binds to all network interfaces (`0.0.0.0`) by default, so it automatically listens on your network IP address.
+4. **Access the Portal**: Other computers on the same network can now open their browser and navigate to:
+   `http://<HOST_IP>:8080/HAL/` (e.g., `http://172.32.11.50:8080/HAL/`).
+
